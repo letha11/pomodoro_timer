@@ -1,0 +1,42 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:pomodoro_timer/timer/data/models/timer_model.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
+
+void main() {
+  late TimerModel timer;
+
+  setUp(() {
+    timer = const TimerModel(pomodoroTime: 1000, breakTime: 500);
+  });
+
+  test('TimerModel and TimerEntity should be the same', () {
+    expect(
+        timer,
+        isA<TimerEntity>()
+            .having((p0) => p0.pomodoroTime, 'pomodoroTime', 1000)
+            .having((p0) => p0.breakTime, 'breakTime', 500));
+  });
+
+  group('toJson', () {
+    test('works', () {
+      final result = timer.toJson();
+
+      expect(result, <String, dynamic>{
+        'pomodoro_time': 1000,
+        'break_time': 500,
+      });
+    });
+  });
+
+  group('fromJson', () {
+    test('should get TimerModel when given correct json', () {
+      final result = TimerModel.fromJson(timer.toJson());
+
+      expect(
+          result,
+          isA<TimerEntity>()
+              .having((p0) => p0.pomodoroTime, 'pomodoroTime', 1000)
+              .having((p0) => p0.breakTime, 'breakTime', 500));
+    });
+  });
+}
