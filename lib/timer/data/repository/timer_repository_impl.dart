@@ -22,7 +22,13 @@ class TimerRepositoryImpl implements TimerRepository {
   }
 
   @override
-  Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime}) {
-    throw UnimplementedError();
+  Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime}) async {
+    try {
+      _DBRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+
+      return Right(Success());
+    } catch (e) {
+      return Left(UnhandledFailure());
+    }
   }
 }

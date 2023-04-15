@@ -6,7 +6,7 @@ import 'package:pomodoro_timer/timer/data/models/timer_model.dart';
 // import 'package:dartz/dartz.dart';
 
 abstract class TimerRepositoryDB {
-  void setTimer();
+  void setTimer({int? pomodoroTime, int? breakTime});
   TimerModel getTimer();
 }
 
