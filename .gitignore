@@ -10,6 +10,9 @@
 .svn/
 migrate_working_dir/
 
+# Flutter test coverage folder
+coverage/
+
 # IntelliJ related
 *.iml
 *.ipr
