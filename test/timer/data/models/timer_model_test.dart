@@ -9,7 +9,7 @@ void main() {
     timer = const TimerModel(pomodoroTime: 1000, breakTime: 500);
   });
 
-  test('TimerModel and TimerEntity should be the same', () {
+  test('should be a subclass of Timer entity', () {
     expect(
         timer,
         isA<TimerEntity>()

@@ -14,4 +14,8 @@ class TimerModel extends TimerEntity {
   factory TimerModel.fromJson(Map<String, dynamic> json) => _$TimerModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$TimerModelToJson(this);
+
+  // TimerEntity toEntity() {
+  //   return TimerEntity(pomodoroTime: pomodoroTime, breakTime: breakTime);
+  // }
 }

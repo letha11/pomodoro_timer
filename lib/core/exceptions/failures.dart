@@ -7,4 +7,6 @@ abstract class Failure extends Equatable {
   List<Object?> get props => [];
 }
 
+class UnhandledFailure extends Failure {}
+
 class DBFailure extends Failure {}
