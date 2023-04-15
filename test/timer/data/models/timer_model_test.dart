@@ -39,4 +39,14 @@ void main() {
               .having((p0) => p0.breakTime, 'breakTime', 500));
     });
   });
+
+  group('Equatable', () {
+    test('comparing two TimerModel with the same value should return True', () {
+      const timer1 = TimerModel(pomodoroTime: 1000, breakTime: 500);
+      const timer2 = TimerModel(pomodoroTime: 1000, breakTime: 500);
+
+      expect(timer1, timer2);
+      expect(timer1.props, timer2.props);
+    });
+  });
 }
