@@ -43,10 +43,9 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
 
   @override
   TimerModel getTimer() {
-    final pomodoroTime = box.get('pomodoro_time') ?? 1500;
-    final breakTime = box.get('break_time') ?? 500;
+    final pomodoroTime = box.get('pomodoro_time');
+    final breakTime = box.get('break_time');
 
     return TimerModel(pomodoroTime: pomodoroTime, breakTime: breakTime);
   }
-
 }

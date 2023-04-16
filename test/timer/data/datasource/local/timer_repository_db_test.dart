@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -112,7 +114,7 @@ void main() {
       when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
 
       // act
-      final result = timerRepository.getTimer();  
+      final result = timerRepository.getTimer();
 
       expect(
           result,

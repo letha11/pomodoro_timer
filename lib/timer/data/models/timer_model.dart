@@ -6,7 +6,7 @@ part 'timer_model.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class TimerModel extends TimerEntity {
-  /// Will set default pomodoroTime to 25 minutes, and brekaTime 5 minutes
+  /// Will set default pomodoroTime to 25 minutes, and breakTime 5 minutes
   /// if params not given
   const TimerModel({int? pomodoroTime, int? breakTime})
       : super(pomodoroTime: pomodoroTime ?? 1500, breakTime: breakTime ?? 300);

@@ -10,3 +10,5 @@ abstract class Failure extends Equatable {
 class UnhandledFailure extends Failure {}
 
 class DBFailure extends Failure {}
+
+class FormatFailure extends Failure {}

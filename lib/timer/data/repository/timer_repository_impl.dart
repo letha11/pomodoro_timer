@@ -6,14 +6,14 @@ import 'package:dartz/dartz.dart';
 import 'package:pomodoro_timer/timer/domain/repository/timer_repository.dart';
 
 class TimerRepositoryImpl implements TimerRepository {
-  final TimerRepositoryDB _DBRepository;
+  final TimerRepositoryDB _dbRepository;
 
-  TimerRepositoryImpl({required TimerRepositoryDB timerRepositoryDB}) : _DBRepository = timerRepositoryDB;
+  TimerRepositoryImpl({required TimerRepositoryDB timerRepositoryDB}) : _dbRepository = timerRepositoryDB;
 
   @override
   Future<Either<Failure, TimerEntity>> getTimer() async {
     try {
-      final result = _DBRepository.getTimer();
+      final result = _dbRepository.getTimer();
 
       return Right(result);
     } catch (e) {
@@ -24,7 +24,7 @@ class TimerRepositoryImpl implements TimerRepository {
   @override
   Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime}) async {
     try {
-      _DBRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+      _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
 
       return Right(Success());
     } catch (e) {
