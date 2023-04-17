@@ -37,14 +37,20 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   }
 
   void _onTimerStarted(TimerStarted event, Emitter<TimerState> emit) async {
-    /// cancel the subscription
-    /// because we are about to start a new one.
-    _countdownSubscription?.cancel();
+    if (event.duration > 0) {
+      /// cancel the subscription
+      /// because we are about to start a new one.
+      _countdownSubscription?.cancel();
 
-    _countdown.count(event.duration).fold(
-          (err) => emit(TimerFailure(err.toString())),
-          (data) => data.listen((d) => add(_TimerTicked(duration: d))),
-        );
+      _countdown.count(event.duration).fold(
+        (err) => emit(TimerFailure(err.toString())),
+        (data) {
+          _countdownSubscription = data.listen((d) => add(_TimerTicked(duration: d)));
+        }, // listen
+      );
+    } else {
+      emit(const TimerFailure("Could not start time from 0"));
+    }
   }
 
   _onTimerTicked(_TimerTicked event, Emitter<TimerState> emit) {

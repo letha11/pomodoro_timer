@@ -50,7 +50,7 @@ void main() {
   );
 
   group('TimerStarted event', () {
-    final controller = StreamController<int>();
+    StreamController<int> controller = StreamController<int>();
     const duration = 3;
 
     blocTest(
@@ -128,6 +128,19 @@ void main() {
       },
       expect: () => <TimerState>[TimerFailure('')],
     );
+
+    blocTest(
+      'should emit TimerFailure when the given duration is not above 0 (duration < 0)',
+      build: () => bloc,
+      setUp: () {
+        controller = StreamController<int>();
+        when(countdown.count(duration)).thenReturn(Right(controller.stream));
+      },
+      act: (b) {
+        b.add(const TimerStarted(duration: 0));
+      },
+      expect: () => <TimerState>[TimerFailure('')],
+    );
   });
 
   group('TimerPaused event', () {
@@ -137,6 +150,22 @@ void main() {
       seed: () => TimerInProgress(2),
       act: (b) => b.add(TimerPaused()),
       expect: () => <TimerState>[TimerPause(2)],
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should emit nothing when the state.duration is at 0',
+      build: () => bloc,
+      seed: () => TimerInProgress(2),
+      act: (b) => b.add(TimerPaused()),
+      expect: () => <TimerState>[TimerPause(2)],
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should emit nothing when the state is not TimerInProgress',
+      build: () => bloc,
+      seed: () => TimerComplete(),
+      act: (b) => b.add(TimerPaused()),
+      expect: () => <TimerState>[],
     );
   });
 }
