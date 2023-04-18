@@ -21,13 +21,17 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     required Countdown countdown,
     required GetTimerUsecase getTimerUsecase,
     required SetTimerUsecase setTimerUsecase,
+    StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
         _getTimerUsecase = getTimerUsecase,
         _setTimerUsecase = setTimerUsecase,
+        _countdownSubscription = streamSubscription,
         super(const TimerInitial(0)) {
     on<TimerStarted>(_onTimerStarted);
-    on<_TimerTicked>(_onTimerTicked);
     on<TimerPaused>(_onTimerPaused);
+    on<TimerResumed>(_onTimerResumed);
+
+    on<_TimerTicked>(_onTimerTicked);
   }
 
   @override
@@ -53,15 +57,23 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     }
   }
 
-  _onTimerTicked(_TimerTicked event, Emitter<TimerState> emit) {
-    emit(TimerInProgress(event.duration));
-  }
-
   _onTimerPaused(TimerPaused event, Emitter<TimerState> emit) {
     if (state.duration > 0 && state is TimerInProgress) {
       _countdownSubscription?.pause();
 
       emit(TimerPause(state.duration));
     }
+  }
+
+  _onTimerResumed(TimerResumed event, Emitter<TimerState> emit) {
+    final isPaused = _countdownSubscription?.isPaused ?? false;
+
+    if (state is TimerPause && isPaused && state.duration > 0) {
+      _countdownSubscription?.resume();
+    }
+  }
+
+  _onTimerTicked(_TimerTicked event, Emitter<TimerState> emit) {
+    emit(TimerInProgress(event.duration));
   }
 }

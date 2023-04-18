@@ -13,12 +13,14 @@ import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/timer_bloc.dart';
 
-@GenerateNiceMocks([MockSpec<Countdown>()])
+@GenerateNiceMocks([MockSpec<Countdown>(), MockSpec<StreamSubscription<int>>()])
 import 'timer_bloc_test.mocks.dart';
 
 class MockGetTimerUsecase extends Mock implements GetTimerUsecase {}
 
 class MockSetTimerUsecase extends Mock implements SetTimerUsecase {}
+
+// class MockStreamSubscription<T> extends Mock implements StreamSubscription<T> {}
 
 // class MockEmitter extends Mock implements Emitter<TimerState> {}
 // class MockCountdown extends Mock implements Countdown {}
@@ -28,17 +30,39 @@ void main() {
   late SetTimerUsecase setTimerUsecase;
   late Countdown countdown;
   late TimerBloc bloc;
+  late StreamSubscription<int>? subscription;
+  late StreamController<int> controller;
 
+  const duration = 3;
   setUp(() {
     getTimerUsecase = MockGetTimerUsecase();
     setTimerUsecase = MockSetTimerUsecase();
     countdown = MockCountdown();
+    subscription = MockStreamSubscription();
+    controller = StreamController<int>();
+    // bloc = TimerBloc(
+    //   countdown: countdown,
+    //   getTimerUsecase: getTimerUsecase,
+    //   setTimerUsecase: setTimerUsecase,
+    // );
+
     bloc = TimerBloc(
-      countdown: countdown,
-      getTimerUsecase: getTimerUsecase,
-      setTimerUsecase: setTimerUsecase,
-    );
+        countdown: countdown,
+        getTimerUsecase: getTimerUsecase,
+        setTimerUsecase: setTimerUsecase,
+        streamSubscription: subscription);
   });
+
+  // _emulateTimerStarted({Function()? callback}) async {
+  //   await untilCalled(countdown.count(duration));
+  //   controller.add(3);
+  //   controller.add(2);
+  //   if (callback != null) callback();
+  //   controller.add(1);
+  //   controller.add(0);
+  //
+  //   controller.close();
+  // }
 
   tearDown(() {
     bloc.close();
@@ -50,9 +74,6 @@ void main() {
   );
 
   group('TimerStarted event', () {
-    StreamController<int> controller = StreamController<int>();
-    const duration = 3;
-
     blocTest(
       'should call Counter.count to start the counter',
       build: () => bloc,
@@ -133,7 +154,6 @@ void main() {
       'should emit TimerFailure when the given duration is not above 0 (duration < 0)',
       build: () => bloc,
       setUp: () {
-        controller = StreamController<int>();
         when(countdown.count(duration)).thenReturn(Right(controller.stream));
       },
       act: (b) {
@@ -166,6 +186,60 @@ void main() {
       seed: () => TimerComplete(),
       act: (b) => b.add(TimerPaused()),
       expect: () => <TimerState>[],
+    );
+  });
+
+  group('TimerResume', () {
+    blocTest<TimerBloc, TimerState>(
+      'should call `.resume` method on StreamSubscription when TimerResumed() get sent',
+      build: () => bloc,
+      setUp: () {
+        when(subscription?.isPaused).thenReturn(true);
+      },
+      act: (b) => b.add(TimerResumed()),
+      seed: () => TimerPause(2),
+      verify: (_) {
+        verify(subscription?.resume());
+      },
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should NOT call `.resume`(do nothing) method on StreamSubscription when StreamSubscription.isPaused is not paused(true)',
+      build: () => bloc,
+      setUp: () {
+        when(subscription?.isPaused).thenReturn(false);
+      },
+      act: (b) => b.add(TimerResumed()),
+      seed: () => TimerPause(2),
+      verify: (_) {
+        verifyNever(subscription?.resume());
+      },
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should NOT call `.resume`(do nothing) method on StreamSubscription when state is not TimerPause',
+      build: () => bloc,
+      setUp: () {
+        when(subscription?.isPaused).thenReturn(true);
+      },
+      act: (b) => b.add(TimerResumed()),
+      seed: () => TimerInProgress(2),
+      verify: (_) {
+        verifyNever(subscription?.resume());
+      },
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should NOT call `.resume`(do nothing) method on StreamSubscription when duration is less than 0(duration < 0)',
+      build: () => bloc,
+      setUp: () {
+        when(subscription?.isPaused).thenReturn(true);
+      },
+      act: (b) => b.add(TimerResumed()),
+      seed: () => TimerPause(-1),
+      verify: (_) {
+        verifyNever(subscription?.resume());
+      },
     );
   });
 }

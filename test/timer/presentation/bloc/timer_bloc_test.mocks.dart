@@ -3,12 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i3;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i4;
-import 'package:pomodoro_timer/core/utils/countdown.dart' as _i3;
+import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
+import 'package:pomodoro_timer/core/utils/countdown.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -31,30 +31,123 @@ class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
         );
 }
 
+class _FakeFuture_1<T> extends _i1.SmartFake implements _i3.Future<T> {
+  _FakeFuture_1(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
 /// A class which mocks [Countdown].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockCountdown extends _i1.Mock implements _i3.Countdown {
+class MockCountdown extends _i1.Mock implements _i4.Countdown {
   @override
-  _i2.Either<_i4.Failure, _i5.Stream<int>> count(int? tick) =>
+  _i2.Either<_i5.Failure, _i3.Stream<int>> count(int? tick) =>
       (super.noSuchMethod(
         Invocation.method(
           #count,
           [tick],
         ),
-        returnValue: _FakeEither_0<_i4.Failure, _i5.Stream<int>>(
+        returnValue: _FakeEither_0<_i5.Failure, _i3.Stream<int>>(
           this,
           Invocation.method(
             #count,
             [tick],
           ),
         ),
-        returnValueForMissingStub: _FakeEither_0<_i4.Failure, _i5.Stream<int>>(
+        returnValueForMissingStub: _FakeEither_0<_i5.Failure, _i3.Stream<int>>(
           this,
           Invocation.method(
             #count,
             [tick],
           ),
         ),
-      ) as _i2.Either<_i4.Failure, _i5.Stream<int>>);
+      ) as _i2.Either<_i5.Failure, _i3.Stream<int>>);
+}
+
+/// A class which mocks [StreamSubscription].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockStreamSubscription extends _i1.Mock
+    implements _i3.StreamSubscription<int> {
+  @override
+  bool get isPaused => (super.noSuchMethod(
+        Invocation.getter(#isPaused),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  _i3.Future<void> cancel() => (super.noSuchMethod(
+        Invocation.method(
+          #cancel,
+          [],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+  @override
+  void onData(void Function(int)? handleData) => super.noSuchMethod(
+        Invocation.method(
+          #onData,
+          [handleData],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void onError(Function? handleError) => super.noSuchMethod(
+        Invocation.method(
+          #onError,
+          [handleError],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void onDone(void Function()? handleDone) => super.noSuchMethod(
+        Invocation.method(
+          #onDone,
+          [handleDone],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void pause([_i3.Future<void>? resumeSignal]) => super.noSuchMethod(
+        Invocation.method(
+          #pause,
+          [resumeSignal],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void resume() => super.noSuchMethod(
+        Invocation.method(
+          #resume,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  _i3.Future<E> asFuture<E>([E? futureValue]) => (super.noSuchMethod(
+        Invocation.method(
+          #asFuture,
+          [futureValue],
+        ),
+        returnValue: _FakeFuture_1<E>(
+          this,
+          Invocation.method(
+            #asFuture,
+            [futureValue],
+          ),
+        ),
+        returnValueForMissingStub: _FakeFuture_1<E>(
+          this,
+          Invocation.method(
+            #asFuture,
+            [futureValue],
+          ),
+        ),
+      ) as _i3.Future<E>);
 }
