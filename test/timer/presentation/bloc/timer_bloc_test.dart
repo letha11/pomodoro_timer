@@ -242,4 +242,22 @@ void main() {
       },
     );
   });
+
+  group('TimerReset', () {
+    blocTest<TimerBloc, TimerState>(
+      'should emit TimerInitial when `state` is not TimerInitial',
+      build: () => bloc,
+      seed: () => TimerInProgress(3),
+      act: (b) => b.add(TimerReset()),
+      expect: () => <TimerState>[TimerInitial(0)],
+    );
+
+    blocTest<TimerBloc, TimerState>(
+      'should NOT emit TimerInitial(do nothing) when `state` is TimerInitial',
+      build: () => bloc,
+      seed: () => TimerInitial(0),
+      act: (b) => b.add(TimerReset()),
+      expect: () => <TimerState>[],
+    );
+  });
 }

@@ -30,6 +30,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     on<TimerStarted>(_onTimerStarted);
     on<TimerPaused>(_onTimerPaused);
     on<TimerResumed>(_onTimerResumed);
+    on<TimerReset>(_onTimerReset);
 
     on<_TimerTicked>(_onTimerTicked);
   }
@@ -70,6 +71,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
     if (state is TimerPause && isPaused && state.duration > 0) {
       _countdownSubscription?.resume();
+    }
+  }
+
+  _onTimerReset(TimerReset event, Emitter<TimerState> emit) {
+    if (state is! TimerInitial) {
+      emit(const TimerInitial(0));
     }
   }
 
