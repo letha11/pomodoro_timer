@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,15 +9,15 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
-import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
-import 'package:pomodoro_timer/timer/presentation/blocs/timer_bloc.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
+// import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter_bloc.dart';
 
 @GenerateNiceMocks([MockSpec<Countdown>(), MockSpec<StreamSubscription<int>>()])
-import 'timer_bloc_test.mocks.dart';
+import 'timer_counter_bloc_test.mocks.dart';
 
-class MockGetTimerUsecase extends Mock implements GetTimerUsecase {}
-
-class MockSetTimerUsecase extends Mock implements SetTimerUsecase {}
+// class MockGetTimerUsecase extends Mock implements GetTimerUsecase {}
+// class MockSetTimerUsecase extends Mock implements SetTimerUsecase {}
 
 // class MockStreamSubscription<T> extends Mock implements StreamSubscription<T> {}
 
@@ -26,17 +25,21 @@ class MockSetTimerUsecase extends Mock implements SetTimerUsecase {}
 // class MockCountdown extends Mock implements Countdown {}
 
 void main() {
-  late GetTimerUsecase getTimerUsecase;
-  late SetTimerUsecase setTimerUsecase;
+  const timer = TimerEntity(
+    pomodoroTime: 5,
+    breakTime: 3,
+  );
+  // late GetTimerUsecase getTimerUsecase;
+  // late SetTimerUsecase setTimerUsecase;
   late Countdown countdown;
-  late TimerBloc bloc;
+  late TimerCounterBloc bloc;
   late StreamSubscription<int>? subscription;
   late StreamController<int> controller;
 
   const duration = 3;
   setUp(() {
-    getTimerUsecase = MockGetTimerUsecase();
-    setTimerUsecase = MockSetTimerUsecase();
+    // getTimerUsecase = MockGetTimerUsecase();
+    // setTimerUsecase = MockSetTimerUsecase();
     countdown = MockCountdown();
     subscription = MockStreamSubscription();
     controller = StreamController<int>();
@@ -46,10 +49,11 @@ void main() {
     //   setTimerUsecase: setTimerUsecase,
     // );
 
-    bloc = TimerBloc(
+    bloc = TimerCounterBloc(
         countdown: countdown,
-        getTimerUsecase: getTimerUsecase,
-        setTimerUsecase: setTimerUsecase,
+        // getTimerUsecase: getTimerUsecase,
+        timer: timer,
+        // setTimerUsecase: setTimerUsecase,
         streamSubscription: subscription);
   });
 
@@ -69,18 +73,18 @@ void main() {
   });
 
   test(
-    'initialState of bloc should be TimerInitial by default',
-    () => expect(bloc.state, equals(const TimerInitial(0))),
+    'initialState of bloc should be TimerCounterInitial by default',
+    () => expect(bloc.state, equals(TimerCounterInitial(timer.pomodoroTime))),
   );
 
-  group('TimerStarted event', () {
+  group('TimerCounterStarted event', () {
     blocTest(
       'should call Counter.count to start the counter',
       build: () => bloc,
       setUp: () {
         when(countdown.count(duration)).thenReturn(Right(StreamController<int>().stream));
       },
-      act: (b) => b.add(TimerStarted(duration: duration)),
+      act: (b) => b.add(TimerCounterStarted(duration: duration)),
       verify: (_) {
         verify(countdown.count(duration));
       },
@@ -104,9 +108,9 @@ void main() {
     test('should emit an error when the duration is < 0', () async {
       when(countdown.count(duration)).thenReturn(Left(FormatFailure()));
 
-      bloc.add(TimerStarted(duration: duration));
+      bloc.add(TimerCounterStarted(duration: duration));
       await untilCalled(countdown.count(duration));
-      expect(bloc.state, equals(TimerFailure('')));
+      expect(bloc.state, equals(TimerCounterFailure('')));
     });
 
     blocTest(
@@ -120,7 +124,7 @@ void main() {
         when(countdown.count(duration)).thenReturn(Right(controller.stream));
       },
       act: (b) async {
-        b.add(const TimerStarted(duration: duration));
+        b.add(const TimerCounterStarted(duration: duration));
         await untilCalled(countdown.count(duration));
         controller.add(3);
         controller.add(2);
@@ -129,11 +133,11 @@ void main() {
 
         controller.close();
       },
-      expect: () => <TimerState>[
-        const TimerInProgress(3),
-        const TimerInProgress(2),
-        const TimerInProgress(1),
-        const TimerInProgress(0),
+      expect: () => <TimerCounterState>[
+        const TimerCounterInProgress(3),
+        const TimerCounterInProgress(2),
+        const TimerCounterInProgress(1),
+        const TimerCounterInProgress(0),
       ],
     );
 
@@ -144,10 +148,10 @@ void main() {
         when(countdown.count(duration)).thenReturn(Left(FormatFailure()));
       },
       act: (b) async {
-        b.add(const TimerStarted(duration: duration));
+        b.add(const TimerCounterStarted(duration: duration));
         await untilCalled(countdown.count(duration));
       },
-      expect: () => <TimerState>[TimerFailure('')],
+      expect: () => <TimerCounterState>[TimerCounterFailure('')],
     );
 
     blocTest(
@@ -157,107 +161,123 @@ void main() {
         when(countdown.count(duration)).thenReturn(Right(controller.stream));
       },
       act: (b) {
-        b.add(const TimerStarted(duration: 0));
+        b.add(const TimerCounterStarted(duration: 0));
       },
-      expect: () => <TimerState>[TimerFailure('')],
+      expect: () => <TimerCounterState>[TimerCounterFailure('')],
     );
   });
 
-  group('TimerPaused event', () {
-    blocTest<TimerBloc, TimerState>(
+  group('TimerCounterPaused event', () {
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit TimerPause with the current/given duration when TimerPaused event get sent',
       build: () => bloc,
-      seed: () => TimerInProgress(2),
-      act: (b) => b.add(TimerPaused()),
-      expect: () => <TimerState>[TimerPause(2)],
+      seed: () => TimerCounterInProgress(2),
+      act: (b) => b.add(TimerCounterPaused()),
+      expect: () => <TimerCounterState>[TimerCounterPause(2)],
     );
 
-    blocTest<TimerBloc, TimerState>(
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit nothing when the state.duration is at 0',
       build: () => bloc,
-      seed: () => TimerInProgress(2),
-      act: (b) => b.add(TimerPaused()),
-      expect: () => <TimerState>[TimerPause(2)],
+      seed: () => TimerCounterInProgress(2),
+      act: (b) => b.add(TimerCounterPaused()),
+      expect: () => <TimerCounterState>[TimerCounterPause(2)],
     );
 
-    blocTest<TimerBloc, TimerState>(
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit nothing when the state is not TimerInProgress',
       build: () => bloc,
-      seed: () => TimerComplete(),
-      act: (b) => b.add(TimerPaused()),
-      expect: () => <TimerState>[],
+      seed: () => TimerCounterComplete(),
+      act: (b) => b.add(TimerCounterPaused()),
+      expect: () => <TimerCounterState>[],
     );
   });
 
-  group('TimerResume', () {
-    blocTest<TimerBloc, TimerState>(
+  group('TimerCounterResumed', () {
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should call `.resume` method on StreamSubscription when TimerResumed() get sent',
       build: () => bloc,
       setUp: () {
         when(subscription?.isPaused).thenReturn(true);
       },
-      act: (b) => b.add(TimerResumed()),
-      seed: () => TimerPause(2),
+      act: (b) => b.add(TimerCounterResumed()),
+      seed: () => TimerCounterPause(2),
       verify: (_) {
         verify(subscription?.resume());
       },
     );
 
-    blocTest<TimerBloc, TimerState>(
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should NOT call `.resume`(do nothing) method on StreamSubscription when StreamSubscription.isPaused is not paused(true)',
       build: () => bloc,
       setUp: () {
         when(subscription?.isPaused).thenReturn(false);
       },
-      act: (b) => b.add(TimerResumed()),
-      seed: () => TimerPause(2),
+      act: (b) => b.add(TimerCounterResumed()),
+      seed: () => TimerCounterPause(2),
       verify: (_) {
         verifyNever(subscription?.resume());
       },
     );
 
-    blocTest<TimerBloc, TimerState>(
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should NOT call `.resume`(do nothing) method on StreamSubscription when state is not TimerPause',
       build: () => bloc,
       setUp: () {
         when(subscription?.isPaused).thenReturn(true);
       },
-      act: (b) => b.add(TimerResumed()),
-      seed: () => TimerInProgress(2),
+      act: (b) => b.add(TimerCounterResumed()),
+      seed: () => TimerCounterInProgress(2),
       verify: (_) {
         verifyNever(subscription?.resume());
       },
     );
 
-    blocTest<TimerBloc, TimerState>(
+    blocTest<TimerCounterBloc, TimerCounterState>(
       'should NOT call `.resume`(do nothing) method on StreamSubscription when duration is less than 0(duration < 0)',
       build: () => bloc,
       setUp: () {
         when(subscription?.isPaused).thenReturn(true);
       },
-      act: (b) => b.add(TimerResumed()),
-      seed: () => TimerPause(-1),
+      act: (b) => b.add(TimerCounterResumed()),
+      seed: () => TimerCounterPause(-1),
       verify: (_) {
         verifyNever(subscription?.resume());
       },
     );
   });
 
-  group('TimerReset', () {
-    blocTest<TimerBloc, TimerState>(
-      'should emit TimerInitial when `state` is not TimerInitial',
+  group('TimerCounterReset', () {
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should emit TimerCounterInitial when `state` is NOT TimerCounterInitial',
       build: () => bloc,
-      seed: () => TimerInProgress(3),
-      act: (b) => b.add(TimerReset()),
-      expect: () => <TimerState>[TimerInitial(0)],
+      seed: () => TimerCounterInProgress(3),
+      act: (b) => b.add(TimerCounterReset()),
+      expect: () => <TimerCounterState>[TimerCounterInitial(timer.pomodoroTime)],
     );
 
-    blocTest<TimerBloc, TimerState>(
-      'should NOT emit TimerInitial(do nothing) when `state` is TimerInitial',
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should NOT emit TimerCounterInitial(do nothing) when `state` is TimerCounterInitial',
       build: () => bloc,
-      seed: () => TimerInitial(0),
-      act: (b) => b.add(TimerReset()),
-      expect: () => <TimerState>[],
+      seed: () => TimerCounterInitial(0),
+      act: (b) => b.add(TimerCounterReset()),
+      expect: () => <TimerCounterState>[],
+    );
+  });
+
+  group('TimerCounterChange', () {
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should emit TimerCounterInitial with breakTime value when type is TimerType.breakTime',
+      build: () => bloc,
+      act: (b) => b.add(TimerCounterChange(TimerType.breakTime)),
+      expect: () => <TimerCounterState>[TimerCounterInitial(timer.breakTime)],
+    );
+
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
+      build: () => bloc,
+      act: (b) => b.add(TimerCounterChange(TimerType.pomodoro)),
+      expect: () => <TimerCounterState>[TimerCounterInitial(timer.pomodoroTime)],
     );
   });
 }
