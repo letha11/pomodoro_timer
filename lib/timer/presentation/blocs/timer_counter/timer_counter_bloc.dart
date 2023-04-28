@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
-import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
 
 part 'timer_counter_event.dart';
 
@@ -18,30 +17,19 @@ enum TimerType {
 
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final Countdown _countdown;
-  // final GetTimerUsecase _getTimerUsecase;
-  // final SetTimerUsecase _setTimerUsecase;
   // ignore: prefer_final_fields
   int _duration = 0;
   final TimerEntity _timer;
 
   StreamSubscription<int>? _countdownSubscription;
 
-  // get duration => _duration;
-
   TimerCounterBloc({
     required Countdown countdown,
     required TimerEntity timer,
-    // required GetTimerUsecase getTimerUsecase,
-    // required SetTimerUsecase setTimerUsecase,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
-        // _getTimerUsecase = getTimerUsecase,
-        // _setTimerUsecase = setTimerUsecase,
         _timer = timer,
         _countdownSubscription = streamSubscription,
-        // _duration = duration ?? 0,
-        // Not using _duration value in initial state because
-        // it will throws an error
         super(TimerCounterInitial(timer.pomodoroTime)) {
     _duration = timer.pomodoroTime; // set default timer
 

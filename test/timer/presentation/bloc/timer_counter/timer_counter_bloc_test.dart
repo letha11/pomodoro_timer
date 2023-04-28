@@ -11,7 +11,7 @@ import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 // import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
-import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter_bloc.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 
 @GenerateNiceMocks([MockSpec<Countdown>(), MockSpec<StreamSubscription<int>>()])
 import 'timer_counter_bloc_test.mocks.dart';

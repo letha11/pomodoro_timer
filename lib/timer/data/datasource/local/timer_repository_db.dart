@@ -1,9 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:pomodoro_timer/timer/data/models/timer_model.dart';
-// import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
-// import 'package:pomodoro_timer/core/success.dart';
-// import 'package:pomodoro_timer/core/exceptions/failures.dart';
-// import 'package:dartz/dartz.dart';
 
 abstract class TimerRepositoryDB {
   void setTimer({int? pomodoroTime, int? breakTime});
@@ -44,7 +40,7 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
   @override
   TimerModel getTimer() {
     final pomodoroTime = box.get('pomodoro_time');
-    final breakTime = box.get('break_time');
+    final breakTime = box.get('break_time') ?? 500;
 
     return TimerModel(pomodoroTime: pomodoroTime, breakTime: breakTime);
   }
