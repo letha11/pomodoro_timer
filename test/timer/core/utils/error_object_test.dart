@@ -25,6 +25,17 @@ void main() {
 
   group('mapFailureToError', () {
     test(
+        'should create ErrorObject with message ${errorMessage['default']} when Failure is not handled by the if\'s',
+        () {
+      final eo = ErrorObject.mapFailureToError(FormatFailure());
+
+      expect(
+        eo,
+        isA<ErrorObject>().having((p0) => p0.message, 'message', errorMessage['default']),
+      );
+    });
+
+    test(
         'should create ErrorObject with message ${errorMessage['default']} when Failure is `UnhandledFailure`',
         () {
       final eo = ErrorObject.mapFailureToError(UnhandledFailure());
