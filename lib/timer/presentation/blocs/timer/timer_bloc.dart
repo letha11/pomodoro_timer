@@ -1,9 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
-import '../../../../core/exceptions/failures.dart';
 import '../../../../core/utils/error_object.dart';
 import '../../../domain/usecase/usecases.dart';
 
@@ -45,8 +42,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
       emit(
         ts.fold(
-          (l) => TimerInitial(),
-          (r) => (state as TimerLoaded)
+          (err) => (state as TimerLoaded).copyWith(error: ErrorObject.mapFailureToError(err)),
+          (data) => (state as TimerLoaded)
               .copyWith(pomodoroTime: event.pomodoroTime, breakTime: event.breakTime),
         ),
       );

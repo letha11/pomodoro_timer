@@ -109,5 +109,21 @@ void main() {
       seed: () => TimerLoaded(pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
       expect: () => <TimerState>[TimerLoaded(pomodoroTime: 5, breakTime: 3)],
     );
+
+    blocTest<TimerBloc, TimerState>(
+      'should emit previous TimerLoaded state with an `error` field filled when error ocured while set data to local database',
+      build: () => bloc,
+      act: (b) => b.add(TimerSet()),
+      setUp: () =>
+          when(setTimerUsecase()).thenAnswer((realInvocation) async => Left(UnhandledFailure())),
+      seed: () => TimerLoaded(pomodoroTime: 5, breakTime: 3),
+      expect: () => <TimerState>[
+        TimerLoaded(
+          pomodoroTime: 5,
+          breakTime: 3,
+          error: ErrorObject.mapFailureToError(UnhandledFailure()),
+        ),
+      ],
+    );
   });
 }
