@@ -6,12 +6,6 @@ import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 
 void main() {
-  late ErrorObject errorObject;
-
-  setUp(() {
-    errorObject = ErrorObject();
-  });
-
   group('constructor', () {
     test('should create ErrorObject object with the given message', () {
       final eo = ErrorObject(message: 'dummy');

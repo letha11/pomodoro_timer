@@ -17,10 +17,6 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 @GenerateNiceMocks([MockSpec<GetTimerUsecase>(), MockSpec<SetTimerUsecase>()])
 import './timer_bloc_test.mocks.dart';
 
-// class MockGetTimerUsecase extends Mock implements GetTimerUsecase {}
-
-// class MockSetTimerUsecase extends Mock implements SetTimerUsecase {}
-
 void main() {
   const TimerEntity timer = TimerEntity(pomodoroTime: 10, breakTime: 5);
   late GetTimerUsecase getTimerUsecase;

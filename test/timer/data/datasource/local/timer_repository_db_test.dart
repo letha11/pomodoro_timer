@@ -41,7 +41,8 @@ void main() {
     test('instantiate TimerRepositoryDB.create when hive is not provided',
         () => expect(TimerRepositoryHiveDB.create(hive: hive), isNotNull));
 
-    test('box should be filled when constructing a new TimerRepositoryDB', () async {
+    test('box should be filled when constructing a new TimerRepositoryDB',
+        () async {
       /// make another HiveInterface instance
       /// to seperate HiveInterface from [setUp] function
       final hive = MockHiveInterface();
@@ -62,7 +63,9 @@ void main() {
     const pomodoroTime = 1000;
     const breakTime = 500;
 
-    test('should store pomodoroTime into \'pomodoro_time\' when only pomodoroTime given', () {
+    test(
+        'should store pomodoroTime into \'pomodoro_time\' when only pomodoroTime given',
+        () {
       // arrange
       when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
 
@@ -88,13 +91,16 @@ void main() {
       expect(box.get('break_time'), breakTime);
     });
 
-    test('should store both pomodoroTime and breakTime when both parameters given', () {
+    test(
+        'should store both pomodoroTime and breakTime when both parameters given',
+        () {
       // arrange
       when(box.get('break_time')).thenReturn(breakTime);
       when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
 
       // act
-      timerRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+      timerRepository.setTimer(
+          pomodoroTime: pomodoroTime, breakTime: breakTime);
 
       // assert
       verify(box.put('break_time', breakTime)).called(1);
