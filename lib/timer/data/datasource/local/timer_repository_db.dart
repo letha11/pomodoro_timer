@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:pomodoro_timer/timer/data/models/timer_model.dart';
+import '../../models/timer_model.dart';
 
 import '../../../../core/utils/logger.dart';
 

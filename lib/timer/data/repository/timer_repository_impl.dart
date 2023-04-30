@@ -1,9 +1,9 @@
-import 'package:pomodoro_timer/timer/data/datasource/local/timer_repository_db.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
-import 'package:pomodoro_timer/core/success.dart';
-import 'package:pomodoro_timer/core/exceptions/failures.dart';
+import '../datasource/local/timer_repository_db.dart';
+import '../../domain/entity/timer_entity.dart';
+import '../../../core/success.dart';
+import '../../../core/exceptions/failures.dart';
 import 'package:dartz/dartz.dart';
-import 'package:pomodoro_timer/timer/domain/repository/timer_repository.dart';
+import '../../domain/repository/timer_repository.dart';
 
 import '../../../core/utils/logger.dart';
 

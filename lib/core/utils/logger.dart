@@ -1,5 +1,6 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
+
 export 'package:logger/logger.dart';
 
 abstract class ILogger {

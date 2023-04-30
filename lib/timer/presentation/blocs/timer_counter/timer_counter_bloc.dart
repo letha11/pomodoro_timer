@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
+import '../../../../core/utils/countdown.dart';
+import '../../../domain/entity/timer_entity.dart';
 import '../../../../core/utils/error_object.dart';
 import '../../../../core/utils/logger.dart';
 

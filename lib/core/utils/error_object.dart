@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../exceptions/failures.dart';
 import '../constants.dart';
+import '../exceptions/failures.dart';
 
 class ErrorObject extends Equatable {
   final String? message;

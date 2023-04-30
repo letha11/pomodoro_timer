@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:pomodoro_timer/core/exceptions/failures.dart';
+
+import '../exceptions/failures.dart';
 
 class Countdown {
   const Countdown();
