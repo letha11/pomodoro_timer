@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'core/utils/service_locator.dart';
+
 void main() {
+  init();
   runApp(const MyApp());
 }
 
