@@ -8,6 +8,7 @@ import '../../timer/domain/usecase/usecases.dart';
 import '../../timer/presentation/blocs/timer/timer_bloc.dart';
 import '../../timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'countdown.dart';
+import 'logger.dart';
 
 // Service Locator
 final sl = GetIt.instance;
@@ -15,6 +16,7 @@ final sl = GetIt.instance;
 void init() {
   // Utils
   sl.registerLazySingleton(() => const Countdown());
+  sl.registerLazySingleton<ILogger>(() => LoggerImpl());
 
   // Repository
   // when we are overriding <T> with an <abstract class>
