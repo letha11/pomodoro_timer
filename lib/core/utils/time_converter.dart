@@ -3,7 +3,7 @@ class TimeConverter {
   /// hhh:mm:ss
   /// the hour can up to as many as the user wants can be hundred, thousands, etc.
   /// if the seconds doesn't reach an hour, the hour(hhh) should be gone.
-  static fromSeconds(int seconds) {
+  String fromSeconds(int seconds) {
     late String result;
 
     /// `~/` operator will divide two integers, and `rounding down` to nearest integer
@@ -22,6 +22,24 @@ class TimeConverter {
     result = hours <= 0 ? '$minuteStr:$secondStr' : '$hourStr:$minuteStr:$secondStr';
 
     return result;
+  }
+
+  int convertStringToSeconds(String time) {
+    List<String> timeList = time.split(':');
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+
+    if (timeList.length == 2) {
+      minutes = int.parse(timeList[0]);
+      seconds = int.parse(timeList[1]);
+    } else if (timeList.length == 3) {
+      hours = int.parse(timeList[0]);
+      minutes = int.parse(timeList[1]);
+      seconds = int.parse(timeList[2]);
+    }
+
+    return (hours * 3600) + (minutes * 60) + seconds;
   }
 }
 
