@@ -36,11 +36,11 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
   void setTimer({int? pomodoroTime, int? breakTime}) {
     _logger?.log(Level.info,
         '[$this(setTimer)] : {pomodoroTime: $pomodoroTime, breakTime: $breakTime}');
-    if (pomodoroTime != null) {
+    if (pomodoroTime != null && pomodoroTime > 0) {
       box.put('pomodoro_time', pomodoroTime);
     }
 
-    if (breakTime != null) {
+    if (breakTime != null && breakTime > 0) {
       box.put('break_time', breakTime);
     }
   }
@@ -49,7 +49,7 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
   TimerModel getTimer() {
     _logger?.log(Level.info, '[$this(getTimer)]');
     final pomodoroTime = box.get('pomodoro_time');
-    final breakTime = box.get('break_time') ?? 500;
+    final breakTime = box.get('break_time');
 
     return TimerModel(pomodoroTime: pomodoroTime, breakTime: breakTime);
   }

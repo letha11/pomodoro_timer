@@ -9,6 +9,7 @@ import '../../timer/presentation/blocs/timer/timer_bloc.dart';
 import '../../timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'countdown.dart';
 import 'logger.dart';
+import 'time_converter.dart';
 
 // Service Locator
 final sl = GetIt.instance;
@@ -16,6 +17,7 @@ final sl = GetIt.instance;
 void init() {
   // Utils
   sl.registerLazySingleton(() => const Countdown());
+  sl.registerLazySingleton(() => TimeConverter());
   sl.registerLazySingleton<ILogger>(() => LoggerImpl());
 
   // Repository
@@ -46,6 +48,7 @@ void init() {
   sl.registerFactoryParam<TimerCounterBloc, TimerEntity, dynamic>(
     (timer, _) => TimerCounterBloc(
       countdown: sl(),
+      timeConverter: sl(),
       timer: timer,
     ),
   );

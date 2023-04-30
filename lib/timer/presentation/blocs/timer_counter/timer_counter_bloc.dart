@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:pomodoro_timer/core/utils/countdown.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
 import '../../../../core/utils/countdown.dart';
+import '../../../../core/utils/time_converter.dart';
 import '../../../domain/entity/timer_entity.dart';
 import '../../../../core/utils/error_object.dart';
 import '../../../../core/utils/logger.dart';
@@ -22,22 +21,25 @@ enum TimerType {
 
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final Countdown _countdown;
-  int _duration = 0;
-  final TimerEntity _timer;
   final ILogger? _logger;
 
+  final TimeConverter timeConverter;
+  final TimerEntity timer;
+
+  TimerType _type = TimerType.pomodoro;
+  int _duration = 0;
   StreamSubscription<int>? _countdownSubscription;
 
   TimerCounterBloc({
     required Countdown countdown,
-    required TimerEntity timer,
+    required this.timer,
+    required this.timeConverter,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
-        _timer = timer,
         _countdownSubscription = streamSubscription,
         _logger = logger,
-        super(TimerCounterInitial(timer.pomodoroTime)) {
+        super(TimerCounterInitial(timeConverter.fromSeconds(timer.pomodoroTime))) {
     _duration = timer.pomodoroTime; // set default timer
 
     on<TimerCounterStarted>(_onTimerStarted);
@@ -55,36 +57,32 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     return super.close();
   }
 
-  void _onTimerStarted(
-      TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
-    if (event.duration > 0) {
-      /// cancel the subscription
-      /// because we are about to start a new one.
-      _countdownSubscription?.cancel();
+  void _onTimerStarted(TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
+    /// cancel the subscription
+    /// because we are about to start a new one.
+    _countdownSubscription?.cancel();
 
-      _countdown.count(event.duration).fold(
-        (err) {
-          _logger?.log(Level.warning, "[count] {duration: ${event.duration}}");
-          emit(TimerCounterFailure(
-            ErrorObject.mapFailureToError(err),
-          ));
-        },
-        (data) {
-          _countdownSubscription =
-              data.listen((d) => add(_TimerCounterTicked(duration: d)));
-        }, // listen
-      );
-    } else {
-      emit(
-        TimerCounterFailure(
-          ErrorObject(message: "Could not start time from 0"),
-        ),
-      );
-    }
+    _countdown.count(_duration).fold(
+      (err) {
+        _logger?.log(Level.warning, "[count] {duration: $_duration}");
+        emit(TimerCounterFailure(
+          ErrorObject.mapFailureToError(err),
+        ));
+      },
+      (data) {
+        late String formatted;
+        _countdownSubscription = data.listen((d) {
+          formatted = timeConverter.fromSeconds(d);
+          add(_TimerCounterTicked(formattedDuration: formatted));
+        });
+      }, // listen
+    );
   }
 
   _onTimerPaused(TimerCounterPaused event, Emitter<TimerCounterState> emit) {
-    if (state.duration > 0 && state is TimerCounterInProgress) {
+    final stateDuration = timeConverter.convertStringToSeconds(state.duration);
+
+    if (stateDuration > 0 && state is TimerCounterInProgress) {
       _countdownSubscription?.pause();
 
       emit(TimerCounterPause(state.duration));
@@ -93,32 +91,41 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
   _onTimerResumed(TimerCounterResumed event, Emitter<TimerCounterState> emit) {
     final isPaused = _countdownSubscription?.isPaused ?? false;
+    final stateDuration = timeConverter.convertStringToSeconds(state.duration);
 
-    if (state is TimerCounterPause && isPaused && state.duration > 0) {
+    if (state is TimerCounterPause && isPaused && stateDuration > 0) {
       _countdownSubscription?.resume();
     }
   }
 
   _onTimerReset(TimerCounterReset event, Emitter<TimerCounterState> emit) {
     if (state is! TimerCounterInitial) {
-      emit(TimerCounterInitial(_duration));
+      _setDurationByType();
+
+      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
     }
   }
 
   _onTimerChange(TimerCounterChange event, Emitter<TimerCounterState> emit) {
-    switch (event.type) {
-      case TimerType.pomodoro:
-        _duration = _timer.pomodoroTime;
-        break;
-      case TimerType.breakTime:
-        _duration = _timer.breakTime;
-        break;
-    }
+    _setDurationByType(event.type);
 
-    emit(TimerCounterInitial(_duration));
+    emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
   }
 
   _onTimerTicked(_TimerCounterTicked event, Emitter<TimerCounterState> emit) {
-    emit(TimerCounterInProgress(event.duration));
+    emit(TimerCounterInProgress(event.formattedDuration));
+  }
+
+  _setDurationByType([TimerType? type]) {
+    switch (type ?? _type) {
+      case TimerType.pomodoro:
+        _duration = timer.pomodoroTime;
+        break;
+      case TimerType.breakTime:
+        _duration = timer.breakTime;
+        break;
+      default:
+        _duration = timer.pomodoroTime;
+    }
   }
 }

@@ -9,6 +9,7 @@ import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
 import 'package:pomodoro_timer/core/utils/countdown.dart' as _i4;
+import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i6;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -150,4 +151,28 @@ class MockStreamSubscription extends _i1.Mock
           ),
         ),
       ) as _i3.Future<E>);
+}
+
+/// A class which mocks [TimeConverter].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockTimeConverter extends _i1.Mock implements _i6.TimeConverter {
+  @override
+  String fromSeconds(int? seconds) => (super.noSuchMethod(
+        Invocation.method(
+          #fromSeconds,
+          [seconds],
+        ),
+        returnValue: '',
+        returnValueForMissingStub: '',
+      ) as String);
+  @override
+  int convertStringToSeconds(String? time) => (super.noSuchMethod(
+        Invocation.method(
+          #fromStringToSeconds,
+          [time],
+        ),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
 }

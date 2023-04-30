@@ -7,8 +7,7 @@ abstract class TimerCounterEvent {
 
 /// Inform TimerBloc that timer has started
 class TimerCounterStarted extends TimerCounterEvent {
-  const TimerCounterStarted({required this.duration});
-  final int duration;
+  // const TimerCounterStarted();
 }
 
 /// Inform TimerBloc that timer has been paused
@@ -28,6 +27,6 @@ class TimerCounterChange extends TimerCounterEvent {
 
 /// Inform TimerBloc that a tick has occurred and that it needs to update its state accordingly
 class _TimerCounterTicked extends TimerCounterEvent {
-  const _TimerCounterTicked({required this.duration});
-  final int duration;
+  const _TimerCounterTicked({required this.formattedDuration});
+  final String formattedDuration;
 }
