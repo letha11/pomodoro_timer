@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "732476650824",
+    "project_id": "pomodoro-crashlytics",
+    "storage_bucket": "pomodoro-crashlytics.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:732476650824:android:502c7275309816e70e6f7d",
+        "android_client_info": {
+          "package_name": "com.example.pomodoro_timer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "732476650824-ipfd7o6lghhh9u0mmj1k1l727pks26qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwd99y02K7jwdiLWliKxIY6cajjeGubFo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "732476650824-ipfd7o6lghhh9u0mmj1k1l727pks26qp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "732476650824-u6icml2e49pqhogvafdsvb51c43u2i13.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pomodoroTimer"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

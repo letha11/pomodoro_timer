@@ -24,7 +24,7 @@ class TimerRepositoryImpl implements TimerRepository {
       return Right(result);
     } catch (e) {
       _logger?.log(Level.error,
-          '[$this(getTimer)] failed on getting timer from local db');
+          '[$this(getTimer)] failed on getting timer from local db', e);
       return Left(UnhandledFailure());
     }
   }
@@ -38,7 +38,7 @@ class TimerRepositoryImpl implements TimerRepository {
       return Right(Success());
     } catch (e) {
       _logger?.log(Level.error,
-          '[$this(setTimer)] failed on setting a timer to local db');
+          '[$this(setTimer)] failed on setting a timer to local db', e);
       return Left(UnhandledFailure());
     }
   }

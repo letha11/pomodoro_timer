@@ -66,7 +66,6 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
           emit(TimerCounterFailure(
             ErrorObject.mapFailureToError(err),
           ));
-          // (err) => TimerFailed(error: ErrorObject.mapFailureToError(err)),
         },
         (data) {
           _countdownSubscription =

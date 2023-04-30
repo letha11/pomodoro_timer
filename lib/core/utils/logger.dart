@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 export 'package:logger/logger.dart';
 
@@ -22,13 +23,19 @@ class LoggerImpl implements ILogger {
         _logger.i("[INFO]: $message", error, stackTrace);
         break;
       case Level.warning:
+        FirebaseCrashlytics.instance
+            .recordError(error, stackTrace, reason: message);
         _logger.w("[WARNING]: $message", error, stackTrace);
         break;
       case Level.error:
         _logger.e("[ERROR]: $message", error, stackTrace);
+        FirebaseCrashlytics.instance
+            .recordError(error, stackTrace, reason: message, fatal: true);
         break;
       case Level.wtf:
         _logger.wtf("[FATAL]: $message", error, stackTrace);
+        FirebaseCrashlytics.instance
+            .recordError(error, stackTrace, reason: message, fatal: true);
         break;
       default:
         _logger.v("[VERBOSE]: $message", error, stackTrace);
