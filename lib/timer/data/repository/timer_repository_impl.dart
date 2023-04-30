@@ -5,10 +5,16 @@ import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:dartz/dartz.dart';
 import 'package:pomodoro_timer/timer/domain/repository/timer_repository.dart';
 
+import '../../../core/utils/logger.dart';
+
 class TimerRepositoryImpl implements TimerRepository {
   final TimerRepositoryDB _dbRepository;
+  final ILogger? _logger;
 
-  TimerRepositoryImpl({required TimerRepositoryDB timerRepositoryDB}) : _dbRepository = timerRepositoryDB;
+  TimerRepositoryImpl(
+      {required TimerRepositoryDB timerRepositoryDB, ILogger? logger})
+      : _dbRepository = timerRepositoryDB,
+        _logger = logger;
 
   @override
   Future<Either<Failure, TimerEntity>> getTimer() async {
@@ -17,17 +23,22 @@ class TimerRepositoryImpl implements TimerRepository {
 
       return Right(result);
     } catch (e) {
+      _logger?.log(Level.error,
+          '[$this(getTimer)] failed on getting timer from local db');
       return Left(UnhandledFailure());
     }
   }
 
   @override
-  Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime}) async {
+  Future<Either<Failure, Success>> setTimer(
+      {int? pomodoroTime, int? breakTime}) async {
     try {
       _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
 
       return Right(Success());
     } catch (e) {
+      _logger?.log(Level.error,
+          '[$this(setTimer)] failed on setting a timer to local db');
       return Left(UnhandledFailure());
     }
   }

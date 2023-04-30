@@ -6,7 +6,6 @@ import '../constants.dart';
 class ErrorObject extends Equatable {
   final String? message;
 
-  // const ErrorObject({this.message = errorMessage["default"]!});
   ErrorObject({String? message}) : message = message ?? errorMessage['default'];
 
   factory ErrorObject.mapFailureToError(Failure f) {
@@ -20,6 +19,5 @@ class ErrorObject extends Equatable {
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [message];
 }

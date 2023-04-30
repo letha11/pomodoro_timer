@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
+import '../../../../core/utils/error_object.dart';
+import '../../../../core/utils/logger.dart';
+
 part 'timer_counter_event.dart';
 
 part 'timer_counter_state.dart';
@@ -17,19 +20,21 @@ enum TimerType {
 
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final Countdown _countdown;
-  // ignore: prefer_final_fields
   int _duration = 0;
   final TimerEntity _timer;
+  final ILogger? _logger;
 
   StreamSubscription<int>? _countdownSubscription;
 
   TimerCounterBloc({
     required Countdown countdown,
     required TimerEntity timer,
+    ILogger? logger,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
         _timer = timer,
         _countdownSubscription = streamSubscription,
+        _logger = logger,
         super(TimerCounterInitial(timer.pomodoroTime)) {
     _duration = timer.pomodoroTime; // set default timer
 
@@ -48,20 +53,32 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     return super.close();
   }
 
-  void _onTimerStarted(TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
+  void _onTimerStarted(
+      TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
     if (event.duration > 0) {
       /// cancel the subscription
       /// because we are about to start a new one.
       _countdownSubscription?.cancel();
 
       _countdown.count(event.duration).fold(
-        (err) => emit(TimerCounterFailure(err.toString())),
+        (err) {
+          _logger?.log(Level.warning, "[count] {duration: ${event.duration}}");
+          emit(TimerCounterFailure(
+            ErrorObject.mapFailureToError(err),
+          ));
+          // (err) => TimerFailed(error: ErrorObject.mapFailureToError(err)),
+        },
         (data) {
-          _countdownSubscription = data.listen((d) => add(_TimerCounterTicked(duration: d)));
+          _countdownSubscription =
+              data.listen((d) => add(_TimerCounterTicked(duration: d)));
         }, // listen
       );
     } else {
-      emit(const TimerCounterFailure("Could not start time from 0"));
+      emit(
+        TimerCounterFailure(
+          ErrorObject(message: "Could not start time from 0"),
+        ),
+      );
     }
   }
 

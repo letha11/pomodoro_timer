@@ -25,10 +25,10 @@ void init() {
   // because i register the `TimerRepositoryDB` with an `TimerRepositoryHiveDB`
   // everytime i call sl() inside of parameter that accept `TimerRepositoryDB` it will always return `TimerRepositoryHiveDB`
   sl.registerLazySingletonAsync<TimerRepositoryDB>(
-    () async => await TimerRepositoryHiveDB.create(),
+    () async => await TimerRepositoryHiveDB.create(logger: sl()),
   );
   sl.registerLazySingleton<TimerRepository>(
-    () => TimerRepositoryImpl(timerRepositoryDB: sl()),
+    () => TimerRepositoryImpl(timerRepositoryDB: sl(), logger: sl()),
   );
 
   // Usecase
@@ -38,11 +38,11 @@ void init() {
   // Blocs
   sl.registerFactory(
     () => TimerBloc(
+      logger: sl(),
       getTimerUsecase: sl(),
       setTimerUsecase: sl(),
     ),
   );
-
   sl.registerFactoryParam<TimerCounterBloc, TimerEntity, dynamic>(
     (timer, _) => TimerCounterBloc(
       countdown: sl(),

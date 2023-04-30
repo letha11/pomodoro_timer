@@ -8,6 +8,7 @@ import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
+import 'package:pomodoro_timer/core/utils/logger.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
@@ -16,6 +17,8 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
 @GenerateNiceMocks([MockSpec<GetTimerUsecase>(), MockSpec<SetTimerUsecase>()])
 import './timer_bloc_test.mocks.dart';
+
+class MockLoggerImpl extends Mock implements LoggerImpl {}
 
 void main() {
   const TimerEntity timer = TimerEntity(pomodoroTime: 10, breakTime: 5);
@@ -38,7 +41,8 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerGet()),
       setUp: () {
-        when(getTimerUsecase.call()).thenAnswer((_) async => const Right(timer));
+        when(getTimerUsecase.call())
+            .thenAnswer((_) async => const Right(timer));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
@@ -50,14 +54,16 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerGet()),
       setUp: () {
-        when(getTimerUsecase()).thenAnswer((realInvocation) async => const Right(timer));
+        when(getTimerUsecase())
+            .thenAnswer((realInvocation) async => const Right(timer));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
       },
       expect: () => <TimerState>[
         TimerLoading(),
-        TimerLoaded(pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime)
+        TimerLoaded(
+            pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime)
       ],
     );
 
@@ -66,7 +72,8 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerGet()),
       setUp: () {
-        when(getTimerUsecase()).thenAnswer((realInvocation) async => Left(UnhandledFailure()));
+        when(getTimerUsecase())
+            .thenAnswer((realInvocation) async => Left(UnhandledFailure()));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
@@ -86,7 +93,8 @@ void main() {
         setTimerUsecase(),
       ).thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(const TimerSet()),
-      seed: () => TimerLoaded(pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
+      seed: () => TimerLoaded(
+          pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
       verify: (_) {
         verify(setTimerUsecase()).called(1);
       },
@@ -102,7 +110,8 @@ void main() {
         ),
       ).thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3)),
-      seed: () => TimerLoaded(pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
+      seed: () => TimerLoaded(
+          pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
       expect: () => <TimerState>[TimerLoaded(pomodoroTime: 5, breakTime: 3)],
     );
 
@@ -110,8 +119,8 @@ void main() {
       'should emit previous TimerLoaded state with an `error` field filled when error ocured while set data to local database',
       build: () => bloc,
       act: (b) => b.add(TimerSet()),
-      setUp: () =>
-          when(setTimerUsecase()).thenAnswer((realInvocation) async => Left(UnhandledFailure())),
+      setUp: () => when(setTimerUsecase())
+          .thenAnswer((realInvocation) async => Left(UnhandledFailure())),
       seed: () => TimerLoaded(pomodoroTime: 5, breakTime: 3),
       expect: () => <TimerState>[
         TimerLoaded(

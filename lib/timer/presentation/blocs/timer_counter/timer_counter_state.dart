@@ -35,7 +35,10 @@ class TimerCounterComplete extends TimerCounterState {
 }
 
 class TimerCounterFailure extends TimerCounterState {
-  final String? message;
+  final ErrorObject error;
 
-  const TimerCounterFailure(this.message) : super(0);
+  const TimerCounterFailure(this.error) : super(0);
+
+  @override
+  List<Object> get props => [error];
 }
