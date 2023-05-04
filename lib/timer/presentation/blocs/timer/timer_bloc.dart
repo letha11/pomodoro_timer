@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
 import '../../../../core/utils/error_object.dart';
 import '../../../../core/utils/logger.dart';
@@ -30,14 +31,15 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     _logger?.log(Level.debug, "TimerGet event get registered");
 
     emit(TimerLoading());
+    // emit(TimerFailed(error: ErrorObject()));
+
     final timer = await _getTimerUsecase();
 
     /// this `fold` method will return data that returned by either
     /// ifRight function/params, or ifLeft function/params
     emit(timer.fold(
       (err) => TimerFailed(error: ErrorObject.mapFailureToError(err)),
-      (data) => TimerLoaded(
-          pomodoroTime: data.pomodoroTime, breakTime: data.breakTime),
+      (data) => TimerLoaded(timer: data),
     ));
   }
 
@@ -54,8 +56,15 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         ts.fold(
           (err) => (state as TimerLoaded)
               .copyWith(error: ErrorObject.mapFailureToError(err)),
-          (data) => (state as TimerLoaded).copyWith(
-              pomodoroTime: event.pomodoroTime, breakTime: event.breakTime),
+          (data) {
+            final _state = state as TimerLoaded;
+            final timer = TimerEntity(
+              pomodoroTime: event.pomodoroTime ?? _state.timer.pomodoroTime,
+              breakTime: event.breakTime ?? _state.timer.breakTime,
+            );
+
+            return (state as TimerLoaded).copyWith(timer: timer);
+          },
         ),
       );
     }

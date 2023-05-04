@@ -12,15 +12,13 @@ class TimerInitial extends TimerState {}
 class TimerLoading extends TimerState {}
 
 class TimerLoaded extends TimerState {
-  final int pomodoroTime;
-  final int breakTime;
+  final TimerEntity timer;
   final ErrorObject? error;
 
-  const TimerLoaded({required this.pomodoroTime, required this.breakTime, this.error});
+  const TimerLoaded({required this.timer, this.error});
 
-  TimerLoaded copyWith({int? pomodoroTime, int? breakTime, ErrorObject? error}) => TimerLoaded(
-        pomodoroTime: pomodoroTime ?? this.pomodoroTime,
-        breakTime: breakTime ?? this.breakTime,
+  TimerLoaded copyWith({TimerEntity? timer, ErrorObject? error}) => TimerLoaded(
+        timer: timer ?? this.timer,
         error: error,
       );
 
@@ -28,7 +26,7 @@ class TimerLoaded extends TimerState {
   /// when you try to compare `TimerLoaded` with another `TimerLoaded` with a different fields value
   /// it will return true/same because it only compare if the 2 classes are TimerLoaded, not the fields value.
   @override
-  List<Object?> get props => [pomodoroTime, breakTime, error];
+  List<Object?> get props => [timer, error];
 }
 
 class TimerFailed extends TimerState {

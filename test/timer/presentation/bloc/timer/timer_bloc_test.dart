@@ -62,8 +62,7 @@ void main() {
       },
       expect: () => <TimerState>[
         TimerLoading(),
-        TimerLoaded(
-            pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime)
+        TimerLoaded(timer: timer),
       ],
     );
 
@@ -93,8 +92,7 @@ void main() {
         setTimerUsecase(),
       ).thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(const TimerSet()),
-      seed: () => TimerLoaded(
-          pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
+      seed: () => TimerLoaded(timer: timer),
       verify: (_) {
         verify(setTimerUsecase()).called(1);
       },
@@ -110,9 +108,12 @@ void main() {
         ),
       ).thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3)),
-      seed: () => TimerLoaded(
-          pomodoroTime: timer.pomodoroTime, breakTime: timer.breakTime),
-      expect: () => <TimerState>[TimerLoaded(pomodoroTime: 5, breakTime: 3)],
+      seed: () => TimerLoaded(timer: timer),
+      expect: () => <TimerState>[
+        TimerLoaded(
+          timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
+        )
+      ],
     );
 
     blocTest<TimerBloc, TimerState>(
@@ -121,11 +122,12 @@ void main() {
       act: (b) => b.add(TimerSet()),
       setUp: () => when(setTimerUsecase())
           .thenAnswer((realInvocation) async => Left(UnhandledFailure())),
-      seed: () => TimerLoaded(pomodoroTime: 5, breakTime: 3),
+      seed: () => TimerLoaded(
+        timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
+      ),
       expect: () => <TimerState>[
         TimerLoaded(
-          pomodoroTime: 5,
-          breakTime: 3,
+          timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
           error: ErrorObject.mapFailureToError(UnhandledFailure()),
         ),
       ],

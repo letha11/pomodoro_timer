@@ -58,7 +58,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   void _onTimerStarted(TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
-    /// cancel the subscription
+    /// cancel the subscription if there are any
     /// because we are about to start a new one.
     _countdownSubscription?.cancel();
 
@@ -117,8 +117,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   _setDurationByType([TimerType? type]) {
+    _type = type ?? _type;
+
     switch (type ?? _type) {
-      case TimerType.pomodoro:
+    case TimerType.pomodoro:
         _duration = timer.pomodoroTime;
         break;
       case TimerType.breakTime:
