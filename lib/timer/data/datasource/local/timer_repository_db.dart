@@ -18,7 +18,7 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
     _logger = logger;
   }
 
-  void _initializeBox() async {
+  Future<void> _initializeBox() async {
     box = await _hive.openBox('timer');
   }
 
@@ -27,7 +27,7 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
     final timerRepositoryDB =
         TimerRepositoryHiveDB._create(hive: hive, logger: logger);
 
-    timerRepositoryDB._initializeBox();
+    await timerRepositoryDB._initializeBox();
 
     return timerRepositoryDB;
   }

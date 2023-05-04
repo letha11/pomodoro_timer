@@ -9,6 +9,9 @@ void main() async {
   /// Ensure that
   WidgetsFlutterBinding.ensureInitialized();
 
+  // initialize hive
+  await Hive.initFlutter();
+
   // initialize service locator
   init();
 
@@ -20,39 +23,32 @@ void main() async {
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  runApp(const MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
+
+  Widget _build(AsyncSnapshot snapshot) {
+    if (snapshot.hasData) {
+      return BlocProvider(
+        create: (context) => sl<TimerBloc>()..add(TimerGet()),
+        child: const HomeScreen(),
+      );
+    } else {
+      return const Scaffold(body: CircularProgressIndicator());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: TextButton(
-          onPressed: () => throw Exception(),
-          child: const Text("Throw Test Exception"),
+      home: SafeArea(
+        child: FutureBuilder(
+          future: sl.allReady(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            return _build(snapshot);
+          },
         ),
       ),
     );

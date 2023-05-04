@@ -26,7 +26,7 @@ void init() {
   // and when some classes need `TimerRepositoryDB` for example
   // because i register the `TimerRepositoryDB` with an `TimerRepositoryHiveDB`
   // everytime i call sl() inside of parameter that accept `TimerRepositoryDB` it will always return `TimerRepositoryHiveDB`
-  sl.registerLazySingletonAsync<TimerRepositoryDB>(
+  sl.registerSingletonAsync<TimerRepositoryDB>(
     () async => await TimerRepositoryHiveDB.create(logger: sl()),
   );
   sl.registerLazySingleton<TimerRepository>(
