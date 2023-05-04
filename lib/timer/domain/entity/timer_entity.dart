@@ -8,4 +8,9 @@ class TimerEntity extends Equatable {
 
   @override
   List<Object?> get props => [pomodoroTime, breakTime];
+
+  @override
+  String toString() {
+    return "TimerEntity: {pomodoroTime: $pomodoroTime, breakTime: $breakTime}";
+  }
 }
