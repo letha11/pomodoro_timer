@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
         body: Column(
           children: [
             BlocConsumer<TimerBloc, TimerState>(
+              bloc: context.read<TimerBloc>(),
               listener: (context, state) {
                 if (state is TimerFailed) {
                   ScaffoldMessenger.of(context).showSnackBar(

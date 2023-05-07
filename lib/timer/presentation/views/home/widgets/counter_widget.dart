@@ -17,6 +17,7 @@ class CounterWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             BlocBuilder<TimerCounterBloc, TimerCounterState>(
+              bloc: context.read<TimerCounterBloc>(),
               builder: (context, state) {
                 return Column(
                   children: [
