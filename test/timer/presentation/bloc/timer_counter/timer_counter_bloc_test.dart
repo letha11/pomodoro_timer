@@ -14,11 +14,7 @@ import 'package:pomodoro_timer/core/utils/time_converter.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 
-@GenerateNiceMocks([
-  MockSpec<Countdown>(),
-  MockSpec<StreamSubscription<int>>(),
-  MockSpec<TimeConverter>()
-])
+@GenerateNiceMocks([MockSpec<Countdown>(), MockSpec<StreamSubscription<int>>(), MockSpec<TimeConverter>()])
 import 'timer_counter_bloc_test.mocks.dart';
 
 // class MockTimeConverter extends Mock implements TimeConverter {}
@@ -78,37 +74,15 @@ void main() {
   );
 
   group('TimerCounterStarted event', () {
-    late StreamController<int> timerCounterStartedController;
-
-    setUp(() {
-      timerCounterStartedController = StreamController<int>();
-    });
-
-    blocTest<TimerCounterBloc, TimerCounterState>(
-      'should not cancel streamSubscription when TimerCounterStarted get sent when running and state is TimerCounterInProgress',
-      build: () => bloc,
-      setUp: () async {
-        when(countdown.count(duration - 1))
-            .thenReturn(Right(timerCounterStartedController.stream));
-      },
-      act: (b) {
-        b.add(TimerCounterStarted());
-      },
-      seed: () => TimerCounterInProgress('00:01'),
-      verify: (b) => verify(subscription?.cancel()).called(1),
-      expect: () => <TimerCounterState>[],
-    );
-
     blocTest(
       'should call Counter.count to start the counter',
       build: () => bloc,
       setUp: () {
-        when(countdown.count(duration - 1))
-            .thenReturn(Right(StreamController<int>().stream));
+        when(countdown.count(duration)).thenReturn(Right(StreamController<int>().stream));
       },
       act: (b) => b.add(TimerCounterStarted()),
       verify: (_) {
-        verify(countdown.count(duration - 1));
+        verify(countdown.count(duration));
       },
     );
 
@@ -128,10 +102,10 @@ void main() {
     // });
 
     test('should emit an error when the duration is < 0', () async {
-      when(countdown.count(duration - 1)).thenReturn(Left(FormatFailure()));
+      when(countdown.count(duration)).thenReturn(Left(FormatFailure()));
 
       bloc.add(TimerCounterStarted());
-      await untilCalled(countdown.count(duration - 1));
+      await untilCalled(countdown.count(duration));
       expect(
         bloc.state,
         equals(
@@ -148,9 +122,7 @@ void main() {
       'should emit TimerInProgress 00:03,00:02,00:01,00:00 when the TimerStarted event get sent',
       build: () => bloc,
       setUp: () async {
-        when(countdown.count(duration - 1))
-            .thenReturn(Right(timerCounterStartedController.stream));
-        when(timeConverter.fromSeconds(4)).thenReturn('00:04');
+        when(countdown.count(duration)).thenReturn(Right(controller.stream));
         when(timeConverter.fromSeconds(3)).thenReturn('00:03');
         when(timeConverter.fromSeconds(2)).thenReturn('00:02');
         when(timeConverter.fromSeconds(1)).thenReturn('00:01');
@@ -158,19 +130,15 @@ void main() {
       },
       act: (b) async {
         b.add(TimerCounterStarted());
-        await untilCalled(countdown.count(duration - 1));
-        // duration - 1 = 4
-        timerCounterStartedController.add(4);
-        timerCounterStartedController.add(3);
-        timerCounterStartedController.add(2);
-        timerCounterStartedController.add(1);
-        timerCounterStartedController.add(0);
+        await untilCalled(countdown.count(duration));
+        controller.add(3);
+        controller.add(2);
+        controller.add(1);
+        controller.add(0);
 
-        timerCounterStartedController.close();
+        controller.close();
       },
       expect: () => <TimerCounterState>[
-        const TimerCounterInProgress("00:05"),
-        const TimerCounterInProgress("00:04"),
         const TimerCounterInProgress("00:03"),
         const TimerCounterInProgress("00:02"),
         const TimerCounterInProgress("00:01"),
@@ -182,37 +150,16 @@ void main() {
       'should emit TimerFailure when the count method had an error',
       build: () => bloc,
       setUp: () async {
-        when(countdown.count(duration - 1)).thenReturn(Left(FormatFailure()));
+        when(countdown.count(duration)).thenReturn(Left(FormatFailure()));
       },
       act: (b) async {
         b.add(TimerCounterStarted());
-        await untilCalled(countdown.count(duration - 1));
+        await untilCalled(countdown.count(duration));
       },
       expect: () => <TimerCounterState>[
         TimerCounterFailure(ErrorObject.mapFailureToError(
           FormatFailure(),
         ))
-      ],
-    );
-
-    blocTest<TimerCounterBloc, TimerCounterState>(
-      'should emit TimerCounterInitial when Stream is finished',
-      build: () => bloc,
-      setUp: () async {
-        when(countdown.count(duration - 1))
-            .thenReturn(Right(timerCounterStartedController.stream));
-        when(timeConverter.fromSeconds(duration - 1)).thenReturn("00:05");
-      },
-      act: (b) async {
-        b.add(TimerCounterStarted());
-        await untilCalled(countdown.count(duration - 1));
-
-        await timerCounterStartedController.close();
-        await Future.delayed(const Duration(seconds: 1));
-      },
-      expect: () => <TimerCounterState>[
-        TimerCounterInProgress("00:05"), // start of the stream
-        TimerCounterInitial("00:05"),
       ],
     );
   });
@@ -232,8 +179,7 @@ void main() {
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit nothing when the state.duration is at 0',
       build: () => bloc,
-      setUp: () =>
-          when(timeConverter.convertStringToSeconds("00:00")).thenReturn(0),
+      setUp: () => when(timeConverter.convertStringToSeconds("00:00")).thenReturn(0),
       seed: () => TimerCounterInProgress("00:00"),
       act: (b) => b.add(TimerCounterPaused()),
       expect: () => <TimerCounterState>[],
@@ -309,9 +255,8 @@ void main() {
       build: () => bloc,
       seed: () => TimerCounterInProgress("00:03"),
       act: (b) => b.add(TimerCounterReset()),
-      expect: () => <TimerCounterState>[
-        TimerCounterInitial("00:05")
-      ], // this TimerCounterInitial depend on timer.pomodoro
+      expect: () =>
+          <TimerCounterState>[TimerCounterInitial("00:05")], // this TimerCounterInitial depend on timer.pomodoro
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
@@ -328,18 +273,14 @@ void main() {
       'should emit TimerCounterInitial with breakTime value when type is TimerType.breakTime',
       build: () => bloc,
       act: (b) => b.add(TimerCounterChange(TimerType.breakTime)),
-      expect: () => <TimerCounterState>[
-        TimerCounterInitial(TimeConverter().fromSeconds(timer.breakTime))
-      ],
+      expect: () => <TimerCounterState>[TimerCounterInitial(TimeConverter().fromSeconds(timer.breakTime))],
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
       build: () => bloc,
       act: (b) => b.add(TimerCounterChange(TimerType.pomodoro)),
-      expect: () => <TimerCounterState>[
-        TimerCounterInitial(TimeConverter().fromSeconds(timer.pomodoroTime))
-      ],
+      expect: () => <TimerCounterState>[TimerCounterInitial(TimeConverter().fromSeconds(timer.pomodoroTime))],
     );
   });
 }
