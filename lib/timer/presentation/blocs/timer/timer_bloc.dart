@@ -31,20 +31,26 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     _logger?.log(Level.debug, "TimerGet event get registered");
 
     emit(TimerLoading());
-    // emit(TimerFailed(error: ErrorObject()));
 
     final timer = await _getTimerUsecase();
 
     /// this `fold` method will return data that returned by either
     /// ifRight function/params, or ifLeft function/params
-    emit(timer.fold(
-      (err) => TimerFailed(error: ErrorObject.mapFailureToError(err)),
-      (data) => TimerLoaded(timer: data),
-    ));
+    emit(
+      timer.fold(
+        (err) => TimerFailed(error: ErrorObject.mapFailureToError(err)),
+        (data) {
+          _logger?.log(
+              Level.debug, "TimerLoaded emitted, [timer: ${data.toString()}]");
+          return TimerLoaded(timer: data);
+        },
+      ),
+    );
   }
 
   _onTimerSet(TimerSet event, Emitter<TimerState> emit) async {
-    _logger?.log(Level.debug, "TimerGet event get registered");
+    _logger?.log(Level.debug,
+        "TimerSet event get registered, [pomodoroTime: ${event.pomodoroTime}, breakTime: ${event.breakTime}]");
 
     /// because when this bloc get initialized, it will
     /// sent an TimerGet event, so the state will be TimerLoaded/TimerFailure.
@@ -57,10 +63,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
           (err) => (state as TimerLoaded)
               .copyWith(error: ErrorObject.mapFailureToError(err)),
           (data) {
-            final _state = state as TimerLoaded;
+            // final state = state as TimerLoaded;
             final timer = TimerEntity(
-              pomodoroTime: event.pomodoroTime ?? _state.timer.pomodoroTime,
-              breakTime: event.breakTime ?? _state.timer.breakTime,
+              pomodoroTime: event.pomodoroTime ??
+                  (state as TimerLoaded).timer.pomodoroTime,
+              breakTime:
+                  event.breakTime ?? (state as TimerLoaded).timer.breakTime,
             );
 
             return (state as TimerLoaded).copyWith(timer: timer);

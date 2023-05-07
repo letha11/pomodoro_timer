@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
 import '../../../../core/utils/countdown.dart';
 import '../../../../core/utils/time_converter.dart';
@@ -39,7 +40,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   })  : _countdown = countdown,
         _countdownSubscription = streamSubscription,
         _logger = logger,
-        super(TimerCounterInitial(timeConverter.fromSeconds(timer.pomodoroTime))) {
+        super(TimerCounterInitial(
+            timeConverter.fromSeconds(timer.pomodoroTime))) {
     _duration = timer.pomodoroTime; // set default timer
 
     on<TimerCounterStarted>(_onTimerStarted);
@@ -57,39 +59,52 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     return super.close();
   }
 
-  void _onTimerStarted(TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
+  void _onTimerStarted(
+      TimerCounterStarted event, Emitter<TimerCounterState> emit) async {
+    _logger?.log(Level.debug, "TimerCounterStarted event get sent");
+
     /// cancel the subscription if there are any
     /// because we are about to start a new one.
-    _countdownSubscription?.cancel();
+    if (state is! TimerCounterInProgress) {
+      _countdownSubscription?.cancel();
 
-    _countdown.count(_duration).fold(
-      (err) {
-        _logger?.log(Level.warning, "[count] {duration: $_duration}");
-        emit(TimerCounterFailure(
-          ErrorObject.mapFailureToError(err),
-        ));
-      },
-      (data) {
-        late String formatted;
-        _countdownSubscription = data.listen((d) {
-          formatted = timeConverter.fromSeconds(d);
-          add(_TimerCounterTicked(formattedDuration: formatted));
-        });
-      }, // listen
-    );
+      await _countdown.count(_duration - 1).fold(
+        (err) {
+          _logger?.log(Level.warning, "[count] {duration: $_duration}");
+          emit(TimerCounterFailure(
+            ErrorObject.mapFailureToError(err),
+          ));
+        },
+        (data) async {
+          add(_TimerCounterTicked(
+              formattedDuration: timeConverter.fromSeconds(_duration)));
+          _logger?.log(Level.debug, "Start Listening into a stream");
+          _countdownSubscription = data.listen((d) {
+            add(_TimerCounterTicked(
+                formattedDuration: timeConverter.fromSeconds(d)));
+          }, onDone: () async {
+            _logger?.log(Level.debug, "Stream Finished");
+            await Future.delayed(const Duration(seconds: 1));
+            add(TimerCounterReset());
+          });
+        }, // listen
+      );
+    }
   }
 
   _onTimerPaused(TimerCounterPaused event, Emitter<TimerCounterState> emit) {
+    _logger?.log(Level.debug, "TimerCounterPaused event get sent");
     final stateDuration = timeConverter.convertStringToSeconds(state.duration);
 
     if (stateDuration > 0 && state is TimerCounterInProgress) {
-      _countdownSubscription?.pause();
+      _countdownSubscription!.pause();
 
       emit(TimerCounterPause(state.duration));
     }
   }
 
   _onTimerResumed(TimerCounterResumed event, Emitter<TimerCounterState> emit) {
+    _logger?.log(Level.debug, "TimerCounterResumed event get sent");
     final isPaused = _countdownSubscription?.isPaused ?? false;
     final stateDuration = timeConverter.convertStringToSeconds(state.duration);
 
@@ -99,6 +114,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   _onTimerReset(TimerCounterReset event, Emitter<TimerCounterState> emit) {
+    _logger?.log(Level.debug, "TimerCounterReset event get sent");
     if (state is! TimerCounterInitial) {
       _setDurationByType();
 
@@ -107,6 +123,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   _onTimerChange(TimerCounterChange event, Emitter<TimerCounterState> emit) {
+    _logger?.log(Level.debug,
+        "TimerCounterChange event get sent, [type: ${event.type}]");
     _setDurationByType(event.type);
 
     emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
@@ -117,10 +135,12 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   _setDurationByType([TimerType? type]) {
+    _logger?.log(
+        Level.debug, "_setDurationByType function get called, [type: $type]");
     _type = type ?? _type;
 
     switch (type ?? _type) {
-    case TimerType.pomodoro:
+      case TimerType.pomodoro:
         _duration = timer.pomodoroTime;
         break;
       case TimerType.breakTime:

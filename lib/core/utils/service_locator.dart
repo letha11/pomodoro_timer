@@ -49,6 +49,7 @@ void init() {
     (timer, _) => TimerCounterBloc(
       countdown: sl(),
       timeConverter: sl(),
+      logger: sl(),
       timer: timer,
     ),
   );
