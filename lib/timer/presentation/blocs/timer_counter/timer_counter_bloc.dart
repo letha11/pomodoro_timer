@@ -116,6 +116,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   _onTimerReset(TimerCounterReset event, Emitter<TimerCounterState> emit) {
     _logger?.log(Level.debug, "TimerCounterReset event get sent");
     if (state is! TimerCounterInitial) {
+      _countdownSubscription?.cancel();
+
       _setDurationByType();
 
       emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
