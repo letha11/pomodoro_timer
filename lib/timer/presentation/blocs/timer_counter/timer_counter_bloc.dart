@@ -109,6 +109,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     final stateDuration = timeConverter.convertStringToSeconds(state.duration);
 
     if (state is TimerCounterPause && isPaused && stateDuration > 0) {
+      // stream.resume will delay vaguely one second
+      // so i just emulate a `TimerRunning` event with emitting a
+      // `TimerCounterInProgress` with the current duration
+      emit(TimerCounterInProgress(state.duration));
       _countdownSubscription?.resume();
     }
   }
