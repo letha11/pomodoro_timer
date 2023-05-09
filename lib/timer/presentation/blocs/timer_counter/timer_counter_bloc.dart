@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
 import '../../../../core/utils/countdown.dart';
 import '../../../../core/utils/time_converter.dart';

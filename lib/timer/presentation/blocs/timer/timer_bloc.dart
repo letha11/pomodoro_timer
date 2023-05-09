@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 
 import '../../../../core/utils/error_object.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../domain/entity/timer_entity.dart';
 import '../../../domain/usecase/usecases.dart';
 
 part 'timer_event.dart';

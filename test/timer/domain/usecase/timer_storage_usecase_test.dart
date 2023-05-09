@@ -48,8 +48,7 @@ void main() {
   group('AddStorageTimerUsecase', () {
     test('should call `repository.add`', () {
       // arrange
-      when(timerRepository.add(timerEntityPopulated))
-          .thenAnswer((_) async => null);
+      when(timerRepository.add(timerEntityPopulated)).thenAnswer((_) async {});
 
       // act
       timerRepository.add(timerEntityPopulated);

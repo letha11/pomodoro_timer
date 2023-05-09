@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 import 'package:pomodoro_timer/timer/domain/repository/timer_storage_repository.dart';
 import 'package:pomodoro_timer/timer/data/repository/timer_storage_repository_impl.dart';

@@ -2,10 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
 import 'core/utils/service_locator.dart';
 import 'firebase_options.dart';
+import 'timer/presentation/blocs/timer/timer_bloc.dart';
 import 'timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'timer/presentation/views/home/home.dart';
 
