@@ -10,12 +10,17 @@ import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
+import 'package:pomodoro_timer/timer/domain/usecase/add_storage_timer.dart';
 
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/set_timer.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
-@GenerateNiceMocks([MockSpec<GetTimerUsecase>(), MockSpec<SetTimerUsecase>()])
+@GenerateNiceMocks([
+  MockSpec<GetTimerUsecase>(),
+  MockSpec<SetTimerUsecase>(),
+  MockSpec<AddStorageTimerUsecase>()
+])
 import './timer_bloc_test.mocks.dart';
 
 class MockLoggerImpl extends Mock implements LoggerImpl {}
@@ -24,28 +29,34 @@ void main() {
   const TimerEntity timer = TimerEntity(pomodoroTime: 10, breakTime: 5);
   late GetTimerUsecase getTimerUsecase;
   late SetTimerUsecase setTimerUsecase;
+  late AddStorageTimerUsecase addStorageTimerUsecase;
   late TimerBloc bloc;
 
   setUp(() {
     getTimerUsecase = MockGetTimerUsecase();
     setTimerUsecase = MockSetTimerUsecase();
+    addStorageTimerUsecase = MockAddStorageTimerUsecase();
     bloc = TimerBloc(
       getTimerUsecase: getTimerUsecase,
       setTimerUsecase: setTimerUsecase,
+      addStorageTimerUsecase: addStorageTimerUsecase,
     );
   });
 
   group('TimerGet', () {
     blocTest<TimerBloc, TimerState>(
-      'should only call getTimerUsecase()/getTimerUsecase.call() once',
+      'should only call getTimerUsecase()/getTimerUsecase.call() and setStorageTimerUsecase once',
       build: () => bloc,
       act: (b) => b.add(TimerGet()),
       setUp: () {
         when(getTimerUsecase.call())
             .thenAnswer((_) async => const Right(timer));
+        // when(addStorageTimerUsecase(timer))
+        //     .thenAnswer((_) async => null));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
+        verify(addStorageTimerUsecase(timer)).called(1);
       },
     );
 
@@ -88,13 +99,13 @@ void main() {
     blocTest<TimerBloc, TimerState>(
       'should only call setTimerUsecase()/setTimerUsecase.call() once',
       build: () => bloc,
-      setUp: () => when(
-        setTimerUsecase(),
-      ).thenAnswer((realInvocation) async => Right(Success())),
+      setUp: () => when(setTimerUsecase())
+          .thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(const TimerSet()),
       seed: () => TimerLoaded(timer: timer),
       verify: (_) {
         verify(setTimerUsecase()).called(1);
+        verify(addStorageTimerUsecase(timer)).called(1);
       },
     );
 

@@ -10,6 +10,9 @@ import 'package:mockito/mockito.dart' as _i1;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
 import 'package:pomodoro_timer/core/utils/countdown.dart' as _i4;
 import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i6;
+import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart' as _i8;
+import 'package:pomodoro_timer/timer/domain/usecase/get_storage_timer.dart'
+    as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -169,10 +172,26 @@ class MockTimeConverter extends _i1.Mock implements _i6.TimeConverter {
   @override
   int convertStringToSeconds(String? time) => (super.noSuchMethod(
         Invocation.method(
-          #fromStringToSeconds,
+          #convertStringToSeconds,
           [time],
         ),
         returnValue: 0,
         returnValueForMissingStub: 0,
       ) as int);
+}
+
+/// A class which mocks [GetStorageTimerUsecase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetStorageTimerUsecase extends _i1.Mock
+    implements _i7.GetStorageTimerUsecase {
+  @override
+  _i3.Stream<_i8.TimerEntity> call() => (super.noSuchMethod(
+        Invocation.method(
+          #call,
+          [],
+        ),
+        returnValue: _i3.Stream<_i8.TimerEntity>.empty(),
+        returnValueForMissingStub: _i3.Stream<_i8.TimerEntity>.empty(),
+      ) as _i3.Stream<_i8.TimerEntity>);
 }

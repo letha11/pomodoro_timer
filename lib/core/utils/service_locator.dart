@@ -1,10 +1,11 @@
 import 'package:get_it/get_it.dart';
 
+import '../../timer/domain/repository/timer_storage_repository.dart';
 import '../../timer/data/datasource/local/timer_repository_db.dart';
 import '../../timer/data/repository/timer_repository_impl.dart';
-import '../../timer/domain/entity/timer_entity.dart';
 import '../../timer/domain/repository/timer_repository.dart';
 import '../../timer/domain/usecase/usecases.dart';
+import '../../timer/data/repository/timer_storage_repository_impl.dart';
 import '../../timer/presentation/blocs/timer/timer_bloc.dart';
 import '../../timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'countdown.dart';
@@ -32,10 +33,14 @@ void init() {
   sl.registerLazySingleton<TimerRepository>(
     () => TimerRepositoryImpl(timerRepositoryDB: sl(), logger: sl()),
   );
+  sl.registerLazySingleton<TimerStorageRepository>(
+      () => TimerStorageRepositoryImpl());
 
   // Usecase
   sl.registerLazySingleton(() => GetTimerUsecase(sl()));
   sl.registerLazySingleton(() => SetTimerUsecase(sl()));
+  sl.registerLazySingleton(() => GetStorageTimerUsecase(sl()));
+  sl.registerLazySingleton(() => AddStorageTimerUsecase(sl()));
 
   // Blocs
   sl.registerFactory(
@@ -43,14 +48,23 @@ void init() {
       logger: sl(),
       getTimerUsecase: sl(),
       setTimerUsecase: sl(),
+      addStorageTimerUsecase: sl(),
     ),
   );
-  sl.registerFactoryParam<TimerCounterBloc, TimerEntity, dynamic>(
-    (timer, _) => TimerCounterBloc(
+  sl.registerFactory<TimerCounterBloc>(
+    () => TimerCounterBloc(
       countdown: sl(),
       timeConverter: sl(),
       logger: sl(),
-      timer: timer,
+      getStorageTimerUsecase: sl(),
     ),
   );
+  // sl.registerFactoryParam<TimerCounterBloc, TimerEntity, dynamic>(
+  //   (timer, _) => TimerCounterBloc(
+  //     countdown: sl(),
+  //     timeConverter: sl(),
+  //     logger: sl(),
+  //     timer: timer,
+  //   ),
+  // );
 }

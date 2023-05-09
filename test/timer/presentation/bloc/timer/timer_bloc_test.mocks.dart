@@ -10,6 +10,8 @@ import 'package:mockito/mockito.dart' as _i1;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
 import 'package:pomodoro_timer/core/success.dart' as _i8;
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart' as _i6;
+import 'package:pomodoro_timer/timer/domain/usecase/add_storage_timer.dart'
+    as _i9;
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart' as _i3;
 import 'package:pomodoro_timer/timer/domain/usecase/set_timer.dart' as _i7;
 
@@ -109,4 +111,19 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
           ),
         )),
       ) as _i4.Future<_i2.Either<_i5.Failure, _i8.Success>>);
+}
+
+/// A class which mocks [AddStorageTimerUsecase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAddStorageTimerUsecase extends _i1.Mock
+    implements _i9.AddStorageTimerUsecase {
+  @override
+  void call(_i6.TimerEntity? timer) => super.noSuchMethod(
+        Invocation.method(
+          #call,
+          [timer],
+        ),
+        returnValueForMissingStub: null,
+      );
 }

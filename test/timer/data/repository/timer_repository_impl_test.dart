@@ -26,7 +26,10 @@ void main() {
   });
 
   group('constructor', () {
-    test('works', () => expect(TimerRepositoryImpl(timerRepositoryDB: timerRepositoryDB), isNotNull));
+    test(
+        'works',
+        () => expect(TimerRepositoryImpl(timerRepositoryDB: timerRepositoryDB),
+            isNotNull));
   });
 
   group('getTimer', () {
@@ -39,7 +42,9 @@ void main() {
       expect(result, equals(Right(timer)));
     });
 
-    test('should return Left(Failure) when _DBRepository.getTimer() throws an Exception', () async {
+    test(
+        'should return Left(Failure) when _DBRepository.getTimer() throws an Exception',
+        () async {
       when(timerRepositoryDB.getTimer()).thenThrow(Exception('woopsie'));
 
       final result = await timerRepository.getTimer();
@@ -53,16 +58,25 @@ void main() {
     const pomodoroTime = 1000;
     const breakTime = 300;
     test('should return Right(TimerEntity) when success', () async {
-      final result = await timerRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+      final result = await timerRepository.setTimer(
+          pomodoroTime: pomodoroTime, breakTime: breakTime);
 
-      verify(timerRepositoryDB.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime)).called(1);
+      verify(timerRepositoryDB.setTimer(
+              pomodoroTime: pomodoroTime, breakTime: breakTime))
+          .called(1);
       expect(result, equals(Right(Success())));
     });
 
-    test('should return Left(Failure) when _DBRepository.setTimer() throws an Exception', () async {
-      when(timerRepositoryDB.setTimer(pomodoroTime: anyNamed('pomodoroTime'), breakTime: anyNamed('breakTime'))).thenThrow(Exception('woopsie'));
+    test(
+        'should return Left(Failure) when _DBRepository.setTimer() throws an Exception',
+        () async {
+      when(timerRepositoryDB.setTimer(
+              pomodoroTime: anyNamed('pomodoroTime'),
+              breakTime: anyNamed('breakTime')))
+          .thenThrow(Exception('woopsie'));
 
-      final result = await timerRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+      final result = await timerRepository.setTimer(
+          pomodoroTime: pomodoroTime, breakTime: breakTime);
 
       // Currently only UnhandledFailure available
       expect(result, equals(Left(UnhandledFailure())));

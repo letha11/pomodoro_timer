@@ -19,10 +19,16 @@ class TimerCounterResumed extends TimerCounterEvent {}
 /// Inform TimerBloc that timer should be reset to the original state
 class TimerCounterReset extends TimerCounterEvent {}
 
-class TimerCounterChange extends TimerCounterEvent {
-  const TimerCounterChange(this.type);
+class TimerCounterTypeChange extends TimerCounterEvent {
+  const TimerCounterTypeChange(this.type);
 
   final TimerType type;
+}
+
+class TimerCounterChange extends TimerCounterEvent {
+  const TimerCounterChange(this.timer);
+
+  final TimerEntity timer;
 }
 
 /// Inform TimerBloc that a tick has occurred and that it needs to update its state accordingly

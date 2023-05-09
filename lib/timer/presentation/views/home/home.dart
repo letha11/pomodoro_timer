@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/utils/service_locator.dart';
 import '../../blocs/timer/timer_bloc.dart';
 import '../../blocs/timer_counter/timer_counter_bloc.dart';
 import 'widgets/counter_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,6 +23,11 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 }
+                // } else if (state is TimerLoaded) {
+                //   context.read<TimerCounterBloc>().add(
+                //         TimerCounterChange(state.timer),
+                //       );
+                // }
               },
               buildWhen: (previous, current) {
                 if (previous is TimerLoaded && current is TimerLoaded) {
@@ -43,18 +46,23 @@ class HomeScreen extends StatelessWidget {
               },
               builder: (context, state) {
                 if (state is TimerLoaded) {
+                  // print('rebuilt TimerLoaded');
                   // Success
                   /// Will create a `TimerCounterBloc` instance everytime `TimerLoaded` state get emitted
-                  // final timerCounterBloc =
-                  //     sl<TimerCounterBloc>(param1: state.timer);
 
+                  // timerCounterBloc = sl<TimerCounterBloc>(param1: state.timer);
                   /// Using BlocProvider.value instead of BlocProvider because
                   /// I need to update the `TimerCounterBloc` depending the `state.timer`
                   /// so when this rebuilt, it will create a new `TimerCounterBloc` with the updated `state.timer`
                   return BlocProvider<TimerCounterBloc>.value(
-                    value: sl<TimerCounterBloc>(param1: state.timer),
+                    value: context.read<TimerCounterBloc>(),
                     child: const CounterWidget(),
                   );
+                  // return BlocProvider<TimerCounterBloc>.value(
+                  //   // create: (c) => sl<TimerCounterBloc>(param1: state.timer),
+                  //   value: sl<TimerCounterBloc>(param1: state.timer),
+                  //   child: const CounterWidget(),
+                  // );
                 } else if (state is TimerFailed) {
                   // Failure
                   return const Text('0');

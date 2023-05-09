@@ -11,7 +11,8 @@ class TimerModel extends TimerEntity {
   const TimerModel({int? pomodoroTime, int? breakTime})
       : super(pomodoroTime: pomodoroTime ?? 1500, breakTime: breakTime ?? 300);
 
-  factory TimerModel.fromJson(Map<String, dynamic> json) => _$TimerModelFromJson(json);
+  factory TimerModel.fromJson(Map<String, dynamic> json) =>
+      _$TimerModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$TimerModelToJson(this);
 

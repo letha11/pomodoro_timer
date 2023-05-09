@@ -13,13 +13,16 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final ILogger? _logger;
   final GetTimerUsecase _getTimerUsecase;
   final SetTimerUsecase _setTimerUsecase;
+  final AddStorageTimerUsecase _addStorageTimerUsecase;
 
   TimerBloc({
     required GetTimerUsecase getTimerUsecase,
     required SetTimerUsecase setTimerUsecase,
+    required AddStorageTimerUsecase addStorageTimerUsecase,
     ILogger? logger,
   })  : _getTimerUsecase = getTimerUsecase,
         _setTimerUsecase = setTimerUsecase,
+        _addStorageTimerUsecase = addStorageTimerUsecase,
         _logger = logger,
         super(TimerInitial()) {
     _logger?.log(Level.info, "Listening Event of TimerBloc");
@@ -42,6 +45,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         (data) {
           _logger?.log(
               Level.debug, "TimerLoaded emitted, [timer: ${data.toString()}]");
+          // adding timer to reactive repository
+          _addStorageTimerUsecase(data);
           return TimerLoaded(timer: data);
         },
       ),
@@ -70,6 +75,9 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
               breakTime:
                   event.breakTime ?? (state as TimerLoaded).timer.breakTime,
             );
+
+            // adding timer to reactive repository
+            _addStorageTimerUsecase(timer);
 
             return (state as TimerLoaded).copyWith(timer: timer);
           },

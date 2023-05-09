@@ -6,6 +6,7 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 
 import 'core/utils/service_locator.dart';
 import 'firebase_options.dart';
+import 'timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'timer/presentation/views/home/home.dart';
 
 void main() async {
@@ -34,8 +35,15 @@ class App extends StatelessWidget {
 
   Widget _build(AsyncSnapshot snapshot) {
     if (snapshot.hasData) {
-      return BlocProvider(
-        create: (context) => sl<TimerBloc>()..add(TimerGet()),
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => sl<TimerBloc>()..add(TimerGet()),
+          ),
+          BlocProvider(
+            create: (context) => sl<TimerCounterBloc>(),
+          ),
+        ],
         child: const HomeScreen(),
       );
     } else {

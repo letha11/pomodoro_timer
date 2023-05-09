@@ -71,13 +71,13 @@ class CounterWidget extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () => context.read<TimerCounterBloc>().add(
-                    const TimerCounterChange(TimerType.breakTime),
+                    const TimerCounterTypeChange(TimerType.breakTime),
                   ),
               child: const Text('Change timer type to Break Time'),
             ),
             ElevatedButton(
               onPressed: () => context.read<TimerCounterBloc>().add(
-                    const TimerCounterChange(TimerType.pomodoro),
+                    const TimerCounterTypeChange(TimerType.pomodoro),
                   ),
               child: const Text('Change timer type to Pomodoro Time'),
             ),
