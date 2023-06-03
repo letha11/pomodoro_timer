@@ -54,6 +54,19 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: "Darker Grotesque",
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w600, // SemiBold
+          ),
+          bodySmall: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600, // SemiBold
+          ),
+        ),
+      ),
       home: SafeArea(
         child: FutureBuilder(
           future: sl.allReady(),
