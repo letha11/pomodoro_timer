@@ -38,7 +38,7 @@ class StyledContainer extends StatelessWidget {
         border: Border.all(
           // color: Colors.black,
           color: active ? Colors.white : Colors.black,
-          width: 2,
+          width: 1,
         ),
       ),
       child: Material(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pomodoro_timer/timer/presentation/widgets/styled_container.dart';
+
+import '../../widgets/styled_container.dart';
+import 'widgets/title_switch.dart';
 
 class TimerSettings extends StatelessWidget {
   const TimerSettings({Key? key}) : super(key: key);
@@ -29,19 +31,16 @@ class TimerSettings extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _timeForm(context, 'pomodoro', '25:00'),  
+                _timeForm(context, 'pomodoro', '25:00'),
                 _timeForm(context, 'break', '05:00'),
                 _timeForm(context, 'long break', '10:00'),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                  Text('Pomodoro Sequence', style: Theme.of(context).textTheme.bodySmall),
-
-              ],
+            SizedBox(height: 16),
+            TitleSwitch(
+              title: "Pomodoro Sequence",
+              onToggle: (val) => print(val),
             ),
-            // Container(width: 100, height: 100, color: Colors.blue),
           ],
         ),
       ),
