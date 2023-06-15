@@ -60,10 +60,12 @@ class App extends StatelessWidget {
           bodyLarge: TextStyle(
             fontSize: 36,
             fontWeight: FontWeight.w600, // SemiBold
+            color: Colors.black,
           ),
           bodySmall: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600, // SemiBold
+            color: Colors.black,
           ),
         ),
       ),
