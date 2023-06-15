@@ -67,6 +67,11 @@ class App extends StatelessWidget {
             fontWeight: FontWeight.w600, // SemiBold
             color: Colors.black,
           ),
+          titleSmall: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500, // SemiBold
+            color: Color(0xFF515151),
+          ), 
         ),
       ),
       home: SafeArea(

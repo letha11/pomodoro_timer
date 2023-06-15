@@ -9,7 +9,7 @@ class StyledContainer extends StatelessWidget {
     this.textStyle,
     this.onTap,
     this.borderRadius = 0,
-    this.padding = const EdgeInsets.only(bottom: 5),
+    this.padding,
     this.active = false,
   }) : assert(text != null ? child == null : child != null);
 
@@ -19,7 +19,7 @@ class StyledContainer extends StatelessWidget {
   final String? text;
   final TextStyle? textStyle;
   final double borderRadius;
-  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? padding;
   final void Function()? onTap;
 
   @override
@@ -47,7 +47,7 @@ class StyledContainer extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
           onTap: onTap,
           child: Padding(
-            padding: padding,
+            padding: padding ?? EdgeInsets.zero,
             child: Center(
               child: child ??
                   Text(

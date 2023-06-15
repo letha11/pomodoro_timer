@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../blocs/timer/timer_bloc.dart';
 import '../../blocs/timer_counter/timer_counter_bloc.dart';
 import '../../widgets/styled_container.dart';
+import '../settings/settings.dart';
 // import 'widgets/counter_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -135,6 +137,7 @@ class _HomeState extends State<Home> {
                 width: 125,
                 text: "25:00",
                 textStyle: Theme.of(context).textTheme.bodyLarge,
+                padding: const EdgeInsets.only(bottom: 5),
               ),
               const SizedBox(height: 33),
               Row(
@@ -180,7 +183,12 @@ class _HomeState extends State<Home> {
           child: StyledContainer(
             padding: const EdgeInsets.all(5),
             borderRadius: 50,
-            onTap: () {},
+            onTap: () => Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => const SettingsScreen(),
+              ),
+            ),
             child: SvgPicture.asset(
               'assets/images/setting.svg',
               width: 24,
@@ -191,4 +199,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
