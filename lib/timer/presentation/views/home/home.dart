@@ -7,7 +7,6 @@ import '../../blocs/timer/timer_bloc.dart';
 import '../../blocs/timer_counter/timer_counter_bloc.dart';
 import '../../widgets/styled_container.dart';
 import '../settings/settings.dart';
-// import 'widgets/counter_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -33,11 +32,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               }
-              // } else if (state is TimerLoaded) {
-              //   context.read<TimerCounterBloc>().add(
-              //         TimerCounterChange(state.timer),
-              //       );
-              // }
             },
             buildWhen: (previous, current) {
               if (previous is TimerLoaded && current is TimerLoaded) {
@@ -56,7 +50,6 @@ class HomeScreen extends StatelessWidget {
             },
             builder: (context, state) {
               if (state is TimerLoaded) {
-                // print('rebuilt TimerLoaded');
                 // Success
                 /// Will create a `TimerCounterBloc` instance everytime `TimerLoaded` state get emitted
 
@@ -96,9 +89,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _activeIndex = 0;
-  final List<String> _tabs = ["pomodoro", "break", "long break"];
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -110,28 +100,7 @@ class _HomeState extends State<Home> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _tabs.map((e) {
-                  int index = _tabs.indexOf(e);
-
-                  return Padding(
-                    padding: EdgeInsets.only(
-                        right: index != (_tabs.length - 1) ? 20.0 : 0.0),
-                    child: StyledContainer(
-                      padding: const EdgeInsets.only(
-                          left: 15, right: 15, bottom: 5, top: 3),
-                      active: _activeIndex == index,
-                      text: e,
-                      onTap: () {
-                        setState(() {
-                          _activeIndex = index;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
+              TimerTypeWidget(),
               const SizedBox(height: 33),
               BlocBuilder<TimerCounterBloc, TimerCounterState>(
                 builder: (context, state) {
@@ -146,7 +115,7 @@ class _HomeState extends State<Home> {
               const SizedBox(height: 33),
               BlocBuilder<TimerCounterBloc, TimerCounterState>(
                 builder: (context, state) {
-                  return _actions(state);
+                  return _actionsWidget(state);
                 },
               ),
             ],
@@ -174,7 +143,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _actions(TimerCounterState state) {
+  Widget _actionsWidget(TimerCounterState state) {
     void play() => context.read<TimerCounterBloc>().add(TimerCounterStarted());
     void resume() =>
         context.read<TimerCounterBloc>().add(TimerCounterResumed());
@@ -220,5 +189,41 @@ class _HomeState extends State<Home> {
     } else {
       return const SizedBox();
     }
+  }
+}
+
+class TimerTypeWidget extends StatelessWidget {
+  final List<TimerType> _tabs = [
+    TimerType.pomodoro,
+    TimerType.breakTime,
+    TimerType.longBreak
+  ];
+
+  TimerTypeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    TimerType type = context.select<TimerCounterBloc, TimerType>((b) => b.type);
+    int activeIndex = _tabs.indexOf(type);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: _tabs.map((e) {
+        int index = _tabs.indexOf(e);
+
+        return Padding(
+          padding:
+              EdgeInsets.only(right: index != (_tabs.length - 1) ? 20.0 : 0.0),
+          child: StyledContainer(
+            padding:
+                const EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 3),
+            active: activeIndex == index,
+            text: e.toShortString(),
+            onTap: () =>
+                context.read<TimerCounterBloc>().add(TimerCounterTypeChange(e)),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

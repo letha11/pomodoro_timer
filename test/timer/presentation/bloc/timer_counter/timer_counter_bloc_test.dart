@@ -322,7 +322,7 @@ void main() {
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
-      build: () => bloc,
+      build: () => bloc..type = TimerType.breakTime,
       seed: () => TimerCounterInProgress(
           "00:02"), // needed this if not seeded the bloc will not emit anything
       act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
@@ -341,6 +341,14 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.longBreak)),
       expect: () => <TimerCounterState>[TimerCounterInitial("00:04")],
+    );
+
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should NOT DO ANYTHING when the given type are the same as the current type',
+      build: () => bloc..type = TimerType.pomodoro,
+      seed: () => TimerCounterInitial("00:00"),
+      act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
+      expect: () => <TimerCounterState>[],
     );
   });
 }

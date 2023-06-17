@@ -21,14 +21,26 @@ enum TimerType {
   longBreak,
 }
 
+extension TTToString on TimerType {
+  String toShortString() {
+    if (name == "breakTime") {
+      return 'break';
+    } else if (name == "longBreak") {
+      return 'long break';
+    } else {
+      return 'pomodoro';
+    }
+  }
+}
+
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final Countdown _countdown;
   final ILogger? _logger;
   final TimeConverter timeConverter;
   final GetStorageTimerUsecase _getStorageTimerUsecase;
   late TimerEntity timer;
+  TimerType type = TimerType.pomodoro;
 
-  TimerType _type = TimerType.pomodoro;
   StreamSubscription<int>? _countdownSubscription;
   int _duration = 0;
   late final StreamSubscription<TimerEntity> _timerSubscription;
@@ -107,7 +119,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
             _logger?.log(Level.debug, "Stream Finished");
             await Future.delayed(const Duration(seconds: 1));
             // will change _duration into breakTime
-            if (_type == TimerType.pomodoro) {
+            if (type == TimerType.pomodoro) {
               _setDurationByType(TimerType.breakTime);
             }
             add(TimerCounterReset());
@@ -154,12 +166,15 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   _onTimerTypeChange(
       TimerCounterTypeChange event, Emitter<TimerCounterState> emit) {
     _logger?.log(Level.debug,
-        "TimerCounterChange event get sent, [type: ${event.type}]");
-    _countdownSubscription?.cancel();
+        "TimerCounterChange event get sent, [type: ${event.type}, currentType: $type]");
 
-    _setDurationByType(event.type);
+    if (type != event.type) {
+      _countdownSubscription?.cancel();
 
-    emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
+      _setDurationByType(event.type);
+
+      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
+    }
   }
 
   _onTimerChange(TimerCounterChange event, Emitter<TimerCounterState> emit) {
@@ -178,12 +193,12 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     emit(TimerCounterInProgress(event.formattedDuration));
   }
 
-  _setDurationByType([TimerType? type]) {
-    _logger?.log(
-        Level.debug, "_setDurationByType function get called, [type: $type]");
-    _type = type ?? _type;
+  _setDurationByType([TimerType? typeArgs]) {
+    _logger?.log(Level.debug,
+        "_setDurationByType function get called, [type: $typeArgs]");
+    type = typeArgs ?? type;
 
-    switch (type ?? _type) {
+    switch (type) {
       case TimerType.pomodoro:
         _duration = timer.pomodoroTime;
         break;
