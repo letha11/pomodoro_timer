@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'styled_switch.dart';
 
-class TitleSwitch extends StatelessWidget {
+class TitleSwitch extends StatefulWidget {
   const TitleSwitch({
     super.key,
     required this.title,
@@ -13,15 +13,36 @@ class TitleSwitch extends StatelessWidget {
   final void Function(bool) onToggle;
 
   @override
+  State<TitleSwitch> createState() => _TitleSwitchState();
+}
+
+class _TitleSwitchState extends State<TitleSwitch> {
+  bool _switch = false;
+
+  _onToggle() {
+    setState(() {
+      _switch = !_switch;
+    });
+    widget.onToggle(_switch);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.bodySmall),
-        StyledSwitch(
-          onToggle: onToggle,
+    return GestureDetector(
+      onTap: _onToggle,
+      child: Container(
+        color: Colors.transparent,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(widget.title, style: Theme.of(context).textTheme.bodySmall),
+            StyledSwitch(
+              value: _switch,
+              onToggle: (val) => _onToggle(),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

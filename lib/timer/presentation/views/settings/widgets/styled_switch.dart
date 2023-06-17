@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
-class StyledSwitch extends StatefulWidget {
-  const StyledSwitch({super.key, required this.onToggle});
+class StyledSwitch extends StatelessWidget {
+  const StyledSwitch({
+    super.key,
+    required this.value,
+    required this.onToggle,
+  });
 
+  final bool value;
   final void Function(bool) onToggle;
-
-  @override
-  State<StyledSwitch> createState() => _StyledSwitchState();
-}
-
-class _StyledSwitchState extends State<StyledSwitch> {
-  bool _switchState = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,7 @@ class _StyledSwitchState extends State<StyledSwitch> {
         ],
       ),
       child: FlutterSwitch(
-        value: _switchState,
+        value: value,
         width: 45,
         height: 25,
         switchBorder: Border.all(color: Colors.black),
@@ -35,14 +33,7 @@ class _StyledSwitchState extends State<StyledSwitch> {
         toggleSize: 20.0,
         toggleBorder: Border.all(color: Colors.black),
         borderRadius: 30.0,
-        // padding: 8.0,
-        onToggle: (val) {
-          setState(() {
-            _switchState = val;
-          });
-
-          widget.onToggle(val);
-        },
+        onToggle: onToggle,
       ),
     );
   }

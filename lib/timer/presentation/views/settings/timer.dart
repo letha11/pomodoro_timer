@@ -29,7 +29,7 @@ class TimerSettings extends StatelessWidget {
                 ),
             decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 6, top: 6),
+              contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 6),
               isDense: true,
             ),
           ),
