@@ -133,46 +133,21 @@ class _HomeState extends State<Home> {
                 }).toList(),
               ),
               const SizedBox(height: 33),
-              StyledContainer(
-                width: 125,
-                text: "25:00",
-                textStyle: Theme.of(context).textTheme.bodyLarge,
-                padding: const EdgeInsets.only(bottom: 5),
+              BlocBuilder<TimerCounterBloc, TimerCounterState>(
+                builder: (context, state) {
+                  return StyledContainer(
+                    width: 125,
+                    text: state.duration,
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                    padding: const EdgeInsets.only(bottom: 5),
+                  );
+                },
               ),
               const SizedBox(height: 33),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  StyledContainer(
-                    padding: const EdgeInsets.all(15),
-                    borderRadius: 50,
-                    onTap: () {},
-                    child: SvgPicture.asset(
-                      'assets/images/pause.svg',
-                      width: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 32),
-                  StyledContainer(
-                    padding: const EdgeInsets.all(15),
-                    borderRadius: 50,
-                    onTap: () {},
-                    child: SvgPicture.asset(
-                      'assets/images/play.svg',
-                      width: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 32),
-                  StyledContainer(
-                    padding: const EdgeInsets.all(15),
-                    borderRadius: 50,
-                    onTap: () {},
-                    child: SvgPicture.asset(
-                      'assets/images/stop.svg',
-                      width: 30,
-                    ),
-                  ),
-                ],
+              BlocBuilder<TimerCounterBloc, TimerCounterState>(
+                builder: (context, state) {
+                  return _actions(state);
+                },
               ),
             ],
           ),
@@ -197,5 +172,53 @@ class _HomeState extends State<Home> {
         ),
       ],
     );
+  }
+
+  Widget _actions(TimerCounterState state) {
+    void play() => context.read<TimerCounterBloc>().add(TimerCounterStarted());
+    void resume() =>
+        context.read<TimerCounterBloc>().add(TimerCounterResumed());
+    void pause() => context.read<TimerCounterBloc>().add(TimerCounterPaused());
+    void reset() => context.read<TimerCounterBloc>().add(TimerCounterReset());
+
+    Widget actionWrapper(String asset, void Function() onTap) =>
+        StyledContainer(
+          padding: const EdgeInsets.all(15),
+          borderRadius: 50,
+          onTap: onTap,
+          child: SvgPicture.asset(
+            asset,
+            width: 30,
+          ),
+        );
+
+    if (state is TimerCounterPause) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          actionWrapper("assets/images/play.svg", resume),
+          const SizedBox(width: 32),
+          actionWrapper("assets/images/stop.svg", reset),
+        ],
+      );
+    } else if (state is TimerCounterInProgress) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          actionWrapper("assets/images/pause.svg", pause),
+          const SizedBox(width: 32),
+          actionWrapper("assets/images/stop.svg", reset),
+        ],
+      );
+    } else if (state is TimerCounterInitial) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          actionWrapper("assets/images/play.svg", play),
+        ],
+      );
+    } else {
+      return const SizedBox();
+    }
   }
 }
