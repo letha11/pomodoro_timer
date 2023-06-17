@@ -6,6 +6,7 @@ class StyledContainer extends StatelessWidget {
     this.text,
     this.child,
     this.width,
+    this.height,
     this.textStyle,
     this.onTap,
     this.borderRadius = 0,
@@ -15,6 +16,7 @@ class StyledContainer extends StatelessWidget {
 
   final bool active;
   final double? width;
+  final double? height;
   final Widget? child;
   final String? text;
   final TextStyle? textStyle;
@@ -26,12 +28,13 @@ class StyledContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
+      height: height,
       decoration: BoxDecoration(
         color: active ? Colors.black : Colors.white,
         boxShadow: [
           BoxShadow(
             color: active ? Colors.white : Colors.black, // active
-            offset: const Offset(2, 2),
+            offset: const Offset(3.5, 3.5),
           ),
         ],
         borderRadius: BorderRadius.all(Radius.circular(borderRadius)),

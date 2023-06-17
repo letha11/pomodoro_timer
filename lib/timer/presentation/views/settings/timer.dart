@@ -4,16 +4,35 @@ import '../../widgets/styled_container.dart';
 import 'widgets/title_switch.dart';
 
 class TimerSettings extends StatelessWidget {
-  const TimerSettings({Key? key}) : super(key: key);
+  TimerSettings({Key? key}) : super(key: key);
 
-  _timeForm(BuildContext ctx, String title, String time) {
+  final _pomodoroTimeController = TextEditingController(text: '25');
+  final _breakTimeController = TextEditingController(text: '5');
+  final _longBreakTimeController = TextEditingController(text: '15');
+
+  _timeForm(BuildContext ctx, String title, TextEditingController controller) {
     return Column(
       children: [
         Text(title, style: Theme.of(ctx).textTheme.bodySmall),
         const SizedBox(height: 5),
         StyledContainer(
-          text: time,
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 3),
+          width: 75,
+          child: TextFormField(
+            controller: controller,
+            cursorColor: Colors.black,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 6, top: 6),
+              isDense: true,
+            ),
+          ),
         ),
         Text('minutes', style: Theme.of(ctx).textTheme.titleSmall),
       ],
@@ -31,12 +50,12 @@ class TimerSettings extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _timeForm(context, 'pomodoro', '25:00'),
-                _timeForm(context, 'break', '05:00'),
-                _timeForm(context, 'long break', '10:00'),
+                _timeForm(context, 'pomodoro', _pomodoroTimeController),
+                _timeForm(context, 'break', _breakTimeController),
+                _timeForm(context, 'long break', _longBreakTimeController),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TitleSwitch(
               title: "Pomodoro Sequence",
               onToggle: (val) => print(val),

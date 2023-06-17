@@ -68,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: StyledContainer(
                       child: TabBarView(
-                        children: const [
+                        children: [
                           TimerSettings(),
                           SoundsSetting(),
                           Placeholder(),
