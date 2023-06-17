@@ -24,6 +24,7 @@ void main() {
       expect(result, <String, dynamic>{
         'pomodoro_time': 1000,
         'break_time': 500,
+        'long_break': 900,
       });
     });
   });

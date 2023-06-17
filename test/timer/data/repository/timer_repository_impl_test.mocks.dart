@@ -69,6 +69,7 @@ class MockTimerRepositoryHiveDB extends _i1.Mock
   void setTimer({
     int? pomodoroTime,
     int? breakTime,
+    int? longBreak,
   }) =>
       super.noSuchMethod(
         Invocation.method(
@@ -77,6 +78,7 @@ class MockTimerRepositoryHiveDB extends _i1.Mock
           {
             #pomodoroTime: pomodoroTime,
             #breakTime: breakTime,
+            #longBreak: longBreak,
           },
         ),
         returnValueForMissingStub: null,

@@ -75,6 +75,7 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
   _i4.Future<_i2.Either<_i5.Failure, _i8.Success>> call({
     int? pomodoroTime,
     int? breakTime,
+    int? longBreak,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -83,6 +84,7 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
           {
             #pomodoroTime: pomodoroTime,
             #breakTime: breakTime,
+            #longBreak: longBreak,
           },
         ),
         returnValue: _i4.Future<_i2.Either<_i5.Failure, _i8.Success>>.value(
@@ -94,6 +96,7 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
             {
               #pomodoroTime: pomodoroTime,
               #breakTime: breakTime,
+              #longBreak: longBreak,
             },
           ),
         )),
@@ -107,6 +110,7 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
             {
               #pomodoroTime: pomodoroTime,
               #breakTime: breakTime,
+              #longBreak: longBreak,
             },
           ),
         )),

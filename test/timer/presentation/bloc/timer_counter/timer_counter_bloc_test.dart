@@ -25,10 +25,7 @@ import 'timer_counter_bloc_test.mocks.dart';
 
 void main() {
   const duration = 5;
-  const timer = TimerEntity(
-    pomodoroTime: duration,
-    breakTime: 3,
-  );
+  const timer = TimerEntity(pomodoroTime: duration, breakTime: 3, longBreak: 5);
 
   late Countdown countdown;
   late TimerCounterBloc bloc;
@@ -314,11 +311,13 @@ void main() {
       final timer = TimerEntity(
         pomodoroTime: 3,
         breakTime: 2,
+        longBreak: 4,
       );
 
       timerEntityController.add(timer);
       when(timeConverter.fromSeconds(3)).thenReturn("00:03");
       when(timeConverter.fromSeconds(2)).thenReturn("00:02");
+      when(timeConverter.fromSeconds(4)).thenReturn("00:04");
     });
 
     blocTest<TimerCounterBloc, TimerCounterState>(
@@ -335,6 +334,13 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.breakTime)),
       expect: () => <TimerCounterState>[TimerCounterInitial("00:02")],
+    );
+
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'should emit TimerCounterInitial with longBreak value when type is TimerType.longBreak',
+      build: () => bloc,
+      act: (b) => b.add(TimerCounterTypeChange(TimerType.longBreak)),
+      expect: () => <TimerCounterState>[TimerCounterInitial("00:04")],
     );
   });
 }

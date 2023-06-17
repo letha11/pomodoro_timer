@@ -31,7 +31,7 @@ class TimerRepositoryImpl implements TimerRepository {
 
   @override
   Future<Either<Failure, Success>> setTimer(
-      {int? pomodoroTime, int? breakTime}) async {
+      {int? pomodoroTime, int? breakTime, int? longBreak}) async {
     try {
       _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
 

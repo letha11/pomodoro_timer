@@ -13,7 +13,7 @@ import 'timer_storage_usecase_test.mocks.dart';
 // class MockTimerRepository extends Mock implements TimerStorageRepository {}
 
 void main() {
-  const timerEntityPopulated = TimerEntity(pomodoroTime: 1000, breakTime: 500);
+  const timerEntityPopulated = TimerEntity(pomodoroTime: 1000, breakTime: 500, longBreak: 900);
   late TimerStorageRepository timerRepository;
   late StreamController<TimerEntity> streamController;
   late GetStorageTimerUsecase getStorageTimerUsecase;

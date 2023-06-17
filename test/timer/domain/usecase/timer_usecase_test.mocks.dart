@@ -67,6 +67,7 @@ class MockTimerRepository extends _i1.Mock implements _i3.TimerRepository {
   _i4.Future<_i2.Either<_i5.Failure, _i7.Success>> setTimer({
     int? pomodoroTime,
     int? breakTime,
+    int? longBreak,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -75,6 +76,7 @@ class MockTimerRepository extends _i1.Mock implements _i3.TimerRepository {
           {
             #pomodoroTime: pomodoroTime,
             #breakTime: breakTime,
+            #longBreak: longBreak,
           },
         ),
         returnValue: _i4.Future<_i2.Either<_i5.Failure, _i7.Success>>.value(
@@ -86,6 +88,7 @@ class MockTimerRepository extends _i1.Mock implements _i3.TimerRepository {
             {
               #pomodoroTime: pomodoroTime,
               #breakTime: breakTime,
+              #longBreak: longBreak,
             },
           ),
         )),
@@ -99,6 +102,7 @@ class MockTimerRepository extends _i1.Mock implements _i3.TimerRepository {
             {
               #pomodoroTime: pomodoroTime,
               #breakTime: breakTime,
+              #longBreak: longBreak,
             },
           ),
         )),

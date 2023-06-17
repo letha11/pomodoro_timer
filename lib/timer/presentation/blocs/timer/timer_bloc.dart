@@ -74,6 +74,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
                   (state as TimerLoaded).timer.pomodoroTime,
               breakTime:
                   event.breakTime ?? (state as TimerLoaded).timer.breakTime,
+              longBreak:
+                  event.longBreak ?? (state as TimerLoaded).timer.longBreak,
             );
 
             // adding timer to reactive repository

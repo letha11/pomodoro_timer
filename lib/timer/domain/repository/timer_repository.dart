@@ -6,6 +6,6 @@ import '../entity/timer_entity.dart';
 
 abstract class TimerRepository {
   Future<Either<Failure, TimerEntity>> getTimer();
-  Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime});
+  Future<Either<Failure, Success>> setTimer({int? pomodoroTime, int? breakTime, int? longBreak});
 }
  

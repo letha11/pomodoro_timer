@@ -14,7 +14,7 @@ import 'timer_usecase_test.mocks.dart';
 
 void main() {
   late TimerRepository timerRepository;
-  const timerEntityPopulated = TimerEntity(pomodoroTime: 1, breakTime: 500);
+  const timerEntityPopulated = TimerEntity(pomodoroTime: 1, breakTime: 500, longBreak: 900);
 
   setUp(() {
     timerRepository = MockTimerRepository();

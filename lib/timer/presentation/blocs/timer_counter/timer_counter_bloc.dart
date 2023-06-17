@@ -18,6 +18,7 @@ part 'timer_counter_state.dart';
 enum TimerType {
   pomodoro,
   breakTime,
+  longBreak,
 }
 
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
@@ -188,6 +189,9 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         break;
       case TimerType.breakTime:
         _duration = timer.breakTime;
+        break;
+      case TimerType.longBreak:
+        _duration = timer.longBreak;
         break;
       default:
         _duration = timer.pomodoroTime;

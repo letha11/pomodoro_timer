@@ -7,6 +7,7 @@ void main() {
   const TimerEntity timer = TimerEntity(
     pomodoroTime: 1000,
     breakTime: 300,
+    longBreak: 900,
   );
   late TimerStorageRepository timerStorageRepository;
 

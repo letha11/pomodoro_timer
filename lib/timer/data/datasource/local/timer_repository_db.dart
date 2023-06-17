@@ -4,7 +4,7 @@ import '../../../data/models/timer_model.dart';
 import '../../../../../core/utils/logger.dart';
 
 abstract class TimerRepositoryDB {
-  void setTimer({int? pomodoroTime, int? breakTime});
+  void setTimer({int? pomodoroTime, int? breakTime, int? longBreak});
   TimerModel getTimer();
 }
 
@@ -33,7 +33,7 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
   }
 
   @override
-  void setTimer({int? pomodoroTime, int? breakTime}) {
+  void setTimer({int? pomodoroTime, int? breakTime, int? longBreak}) {
     _logger?.log(Level.info,
         '[$this(setTimer)] : {pomodoroTime: $pomodoroTime, breakTime: $breakTime}');
     if (pomodoroTime != null && pomodoroTime > 0) {

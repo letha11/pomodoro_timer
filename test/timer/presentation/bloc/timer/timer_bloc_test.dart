@@ -26,7 +26,12 @@ import './timer_bloc_test.mocks.dart';
 class MockLoggerImpl extends Mock implements LoggerImpl {}
 
 void main() {
-  const TimerEntity timer = TimerEntity(pomodoroTime: 10, breakTime: 5);
+  const TimerEntity timer = TimerEntity(
+    pomodoroTime: 10,
+    breakTime: 5,
+    longBreak: 7,
+  );
+  
   late GetTimerUsecase getTimerUsecase;
   late SetTimerUsecase setTimerUsecase;
   late AddStorageTimerUsecase addStorageTimerUsecase;
@@ -118,11 +123,15 @@ void main() {
           breakTime: anyNamed('breakTime'),
         ),
       ).thenAnswer((realInvocation) async => Right(Success())),
-      act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3)),
+      act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3, longBreak: 4)),
       seed: () => TimerLoaded(timer: timer),
       expect: () => <TimerState>[
         TimerLoaded(
-          timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
+          timer: TimerEntity(
+            pomodoroTime: 5,
+            breakTime: 3,
+            longBreak: 4,
+          ),
         )
       ],
     );
@@ -134,11 +143,11 @@ void main() {
       setUp: () => when(setTimerUsecase())
           .thenAnswer((realInvocation) async => Left(UnhandledFailure())),
       seed: () => TimerLoaded(
-        timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
+        timer: TimerEntity(pomodoroTime: 5, breakTime: 3, longBreak: 4),
       ),
       expect: () => <TimerState>[
         TimerLoaded(
-          timer: TimerEntity(pomodoroTime: 5, breakTime: 3),
+          timer: TimerEntity(pomodoroTime: 5, breakTime: 3, longBreak: 4),
           error: ErrorObject.mapFailureToError(UnhandledFailure()),
         ),
       ],
