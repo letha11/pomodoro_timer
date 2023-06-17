@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../widgets/styled_container.dart';
 import 'widgets/title_switch.dart';
@@ -22,6 +23,9 @@ class TimerSettings extends StatelessWidget {
             cursorColor: Colors.black,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
             style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
