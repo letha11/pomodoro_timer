@@ -9,9 +9,10 @@ import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
 import 'package:pomodoro_timer/core/success.dart' as _i8;
+import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i9;
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart' as _i6;
 import 'package:pomodoro_timer/timer/domain/usecase/add_storage_timer.dart'
-    as _i9;
+    as _i10;
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart' as _i3;
 import 'package:pomodoro_timer/timer/domain/usecase/set_timer.dart' as _i7;
 
@@ -117,11 +118,44 @@ class MockSetTimerUsecase extends _i1.Mock implements _i7.SetTimerUsecase {
       ) as _i4.Future<_i2.Either<_i5.Failure, _i8.Success>>);
 }
 
+/// A class which mocks [TimeConverter].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockTimeConverter extends _i1.Mock implements _i9.TimeConverter {
+  @override
+  String fromSeconds(int? seconds) => (super.noSuchMethod(
+        Invocation.method(
+          #fromSeconds,
+          [seconds],
+        ),
+        returnValue: '',
+        returnValueForMissingStub: '',
+      ) as String);
+  @override
+  int convertStringToSeconds(String? time) => (super.noSuchMethod(
+        Invocation.method(
+          #convertStringToSeconds,
+          [time],
+        ),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
+  @override
+  int secondToMinutes(int? sec) => (super.noSuchMethod(
+        Invocation.method(
+          #secondToMinutes,
+          [sec],
+        ),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
+}
+
 /// A class which mocks [AddStorageTimerUsecase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAddStorageTimerUsecase extends _i1.Mock
-    implements _i9.AddStorageTimerUsecase {
+    implements _i10.AddStorageTimerUsecase {
   @override
   void call(_i6.TimerEntity? timer) => super.noSuchMethod(
         Invocation.method(

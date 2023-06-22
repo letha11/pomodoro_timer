@@ -130,7 +130,10 @@ class _HomeState extends State<Home> {
             onTap: () => Navigator.push(
               context,
               CupertinoPageRoute(
-                builder: (context) => const SettingsScreen(),
+                builder: (_) => BlocProvider.value(
+                  value: BlocProvider.of<TimerBloc>(context),
+                  child: const SettingsScreen(),
+                ),
               ),
             ),
             child: SvgPicture.asset(

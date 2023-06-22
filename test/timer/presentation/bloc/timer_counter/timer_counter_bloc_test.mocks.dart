@@ -178,6 +178,15 @@ class MockTimeConverter extends _i1.Mock implements _i6.TimeConverter {
         returnValue: 0,
         returnValueForMissingStub: 0,
       ) as int);
+  @override
+  int secondToMinutes(int? sec) => (super.noSuchMethod(
+        Invocation.method(
+          #secondToMinutes,
+          [sec],
+        ),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
 }
 
 /// A class which mocks [GetStorageTimerUsecase].

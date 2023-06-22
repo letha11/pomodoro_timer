@@ -1,8 +1,10 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pomodoro_timer/timer/presentation/widgets/styled_container.dart';
 
+import '../../../../core/utils/service_locator.dart';
+import '../../../../core/utils/time_converter.dart';
+import '../../blocs/timer/timer_bloc.dart';
 import 'sounds.dart';
 import 'timer.dart';
 
@@ -69,9 +71,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: StyledContainer(
                       child: TabBarView(
                         children: [
-                          TimerSettings(),
-                          SoundsSetting(),
-                          Placeholder(),
+                          BlocBuilder<TimerBloc, TimerState>(
+                            builder: (context, s) {
+                              final state = s as TimerLoaded;
+                              return TimerSettings(
+                                pomodoroTime: sl<TimeConverter>()
+                                    .secondToMinutes(state.timer.pomodoroTime),
+                                breakTime: sl<TimeConverter>()
+                                    .secondToMinutes(state.timer.breakTime),
+                                longBreakTime: sl<TimeConverter>()
+                                    .secondToMinutes(state.timer.longBreak),
+                              );
+                            },
+                          ),
+                          const SoundsSetting(),
+                          const Placeholder(),
                         ],
                       ),
                     ),

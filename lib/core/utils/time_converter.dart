@@ -41,6 +41,14 @@ class TimeConverter {
 
     return (hours * 3600) + (minutes * 60) + seconds;
   }
+
+  int secondToMinutes(int sec) {
+    return sec ~/ 60;
+  }
+
+  int minuteToSecond(int minute) {
+    return minute * 60;
+  }
 }
 
 extension IntX on int {

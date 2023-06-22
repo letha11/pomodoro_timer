@@ -48,6 +48,7 @@ void init() {
       logger: sl(),
       getTimerUsecase: sl(),
       setTimerUsecase: sl(),
+      // timeConverter: sl(),
       addStorageTimerUsecase: sl(),
     ),
   );

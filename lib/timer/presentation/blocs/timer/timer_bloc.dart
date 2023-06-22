@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/utils/error_object.dart';
+// import '../../../../core/utils/time_converter.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../domain/entity/timer_entity.dart';
 import '../../../domain/usecase/usecases.dart';
@@ -15,10 +16,13 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final SetTimerUsecase _setTimerUsecase;
   final AddStorageTimerUsecase _addStorageTimerUsecase;
 
+  // final TimeConverter timeConverter;
+
   TimerBloc({
     required GetTimerUsecase getTimerUsecase,
     required SetTimerUsecase setTimerUsecase,
     required AddStorageTimerUsecase addStorageTimerUsecase,
+    // required this.timeConverter,
     ILogger? logger,
   })  : _getTimerUsecase = getTimerUsecase,
         _setTimerUsecase = setTimerUsecase,
@@ -55,7 +59,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
   _onTimerSet(TimerSet event, Emitter<TimerState> emit) async {
     _logger?.log(Level.debug,
-        "TimerSet event get registered, [pomodoroTime: ${event.pomodoroTime}, breakTime: ${event.breakTime}]");
+        "TimerSet event get registered, [pomodoroTime: ${event.pomodoroTime}, breakTime: ${event.breakTime}, longBreak: ${event.longBreak}]");
 
     /// because when this bloc get initialized, it will
     /// sent an TimerGet event, so the state will be TimerLoaded/TimerFailure.

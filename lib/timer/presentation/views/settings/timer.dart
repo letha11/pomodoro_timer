@@ -1,15 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
 
+import '../../../../core/utils/service_locator.dart';
+import '../../../../core/utils/time_converter.dart';
+import '../../blocs/timer/timer_bloc.dart';
 import '../../widgets/styled_container.dart';
 import 'widgets/title_switch.dart';
 
 class TimerSettings extends StatelessWidget {
-  TimerSettings({Key? key}) : super(key: key);
+  TimerSettings({
+    Key? key,
+    required this.pomodoroTime,
+    required this.breakTime,
+    required this.longBreakTime,
+  }) : super(key: key);
 
-  final _pomodoroTimeController = TextEditingController(text: '25');
-  final _breakTimeController = TextEditingController(text: '5');
-  final _longBreakTimeController = TextEditingController(text: '15');
+  final int pomodoroTime;
+  final int breakTime;
+  final int longBreakTime;
+
+  Timer? _debounce;
+  bool _snackbarActivated = false;
+
+  final _pomodoroTimeController = TextEditingController(text: '0');
+  final _breakTimeController = TextEditingController(text: '0');
+  final _longBreakTimeController = TextEditingController(text: '0');
+
+  void _setTimer(BuildContext ctx) {
+    ctx.read<TimerBloc>().add(
+          TimerSet(
+            pomodoroTime: sl<TimeConverter>().minuteToSecond(
+              int.parse(_pomodoroTimeController.text),
+            ),
+            breakTime: sl<TimeConverter>().minuteToSecond(
+              int.parse(_breakTimeController.text),
+            ),
+            longBreak: sl<TimeConverter>().minuteToSecond(
+              int.parse(_longBreakTimeController.text),
+            ),
+          ),
+        );
+    if (!_snackbarActivated) {
+      _snackbarActivated = true;
+      ScaffoldMessenger.of(ctx)
+          .showSnackBar(
+            SnackBar(
+              width: 80,
+              duration: const Duration(seconds: 2),
+              content: const Center(child: Text("Saved!")),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
+              elevation: 2,
+              behavior: SnackBarBehavior.floating,
+            ),
+          )
+          .closed
+          .then((reason) => _snackbarActivated = false);
+    }
+  }
 
   _timeForm(BuildContext ctx, String title, TextEditingController controller) {
     return Column(
@@ -23,6 +73,15 @@ class TimerSettings extends StatelessWidget {
             cursorColor: Colors.black,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+            onChanged: (val) {
+              if (_debounce?.isActive ?? false) _debounce?.cancel();
+              _debounce = Timer(const Duration(seconds: 2), () {
+                _setTimer(ctx);
+              });
+            },
+            onEditingComplete: () {
+              _setTimer(ctx);
+            },
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
             ],
@@ -54,9 +113,21 @@ class TimerSettings extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _timeForm(context, 'pomodoro', _pomodoroTimeController),
-                _timeForm(context, 'break', _breakTimeController),
-                _timeForm(context, 'long break', _longBreakTimeController),
+                _timeForm(
+                  context,
+                  'pomodoro',
+                  _pomodoroTimeController..text = "$pomodoroTime",
+                ),
+                _timeForm(
+                  context,
+                  'break',
+                  _breakTimeController..text = "$breakTime",
+                ),
+                _timeForm(
+                  context,
+                  'longbreak',
+                  _longBreakTimeController..text = "$longBreakTime",
+                )
               ],
             ),
             const SizedBox(height: 16),
