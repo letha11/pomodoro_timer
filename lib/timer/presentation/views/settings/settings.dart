@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pomodoro_timer/timer/presentation/widgets/styled_container.dart';
 
-import '../../../../core/utils/service_locator.dart';
-import '../../../../core/utils/time_converter.dart';
-import '../../blocs/timer/timer_bloc.dart';
 import 'sounds.dart';
 import 'timer.dart';
 
@@ -42,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 StyledContainer(
@@ -50,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     labelStyle: Theme.of(context).textTheme.bodySmall,
                     unselectedLabelColor: Colors.black,
                     unselectedLabelStyle: Theme.of(context).textTheme.bodySmall,
-                    indicator: BoxDecoration(
+                    indicator: const BoxDecoration(
                       color: Colors.black,
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
@@ -71,19 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: StyledContainer(
                       child: TabBarView(
                         children: [
-                          BlocBuilder<TimerBloc, TimerState>(
-                            builder: (context, s) {
-                              final state = s as TimerLoaded;
-                              return TimerSettings(
-                                pomodoroTime: sl<TimeConverter>()
-                                    .secondToMinutes(state.timer.pomodoroTime),
-                                breakTime: sl<TimeConverter>()
-                                    .secondToMinutes(state.timer.breakTime),
-                                longBreakTime: sl<TimeConverter>()
-                                    .secondToMinutes(state.timer.longBreak),
-                              );
-                            },
-                          ),
+                          TimerSettings(),
                           const SoundsSetting(),
                           const Placeholder(),
                         ],

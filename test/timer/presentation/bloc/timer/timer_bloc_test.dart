@@ -9,7 +9,6 @@ import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
-import 'package:pomodoro_timer/core/utils/time_converter.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/add_storage_timer.dart';
 
@@ -20,7 +19,6 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 @GenerateNiceMocks([
   MockSpec<GetTimerUsecase>(),
   MockSpec<SetTimerUsecase>(),
-  MockSpec<TimeConverter>(),
   MockSpec<AddStorageTimerUsecase>()
 ])
 import './timer_bloc_test.mocks.dart';

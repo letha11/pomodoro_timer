@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/utils/error_object.dart';
-// import '../../../../core/utils/time_converter.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../domain/entity/timer_entity.dart';
 import '../../../domain/usecase/usecases.dart';
@@ -16,13 +15,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final SetTimerUsecase _setTimerUsecase;
   final AddStorageTimerUsecase _addStorageTimerUsecase;
 
-  // final TimeConverter timeConverter;
-
   TimerBloc({
     required GetTimerUsecase getTimerUsecase,
     required SetTimerUsecase setTimerUsecase,
     required AddStorageTimerUsecase addStorageTimerUsecase,
-    // required this.timeConverter,
     ILogger? logger,
   })  : _getTimerUsecase = getTimerUsecase,
         _setTimerUsecase = setTimerUsecase,

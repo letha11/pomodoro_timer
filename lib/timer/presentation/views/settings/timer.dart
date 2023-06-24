@@ -12,14 +12,14 @@ import 'widgets/title_switch.dart';
 class TimerSettings extends StatelessWidget {
   TimerSettings({
     Key? key,
-    required this.pomodoroTime,
-    required this.breakTime,
-    required this.longBreakTime,
+    // required this.pomodoroTime,
+    // required this.breakTime,
+    // required this.longBreakTime,
   }) : super(key: key);
 
-  final int pomodoroTime;
-  final int breakTime;
-  final int longBreakTime;
+  late int pomodoroTime;
+  late int breakTime;
+  late int longBreakTime;
 
   Timer? _debounce;
   bool _snackbarActivated = false;
@@ -94,7 +94,7 @@ class TimerSettings extends StatelessWidget {
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 6),
               isDense: true,
-            ),
+            ), //
           ),
         ),
         Text('minutes', style: Theme.of(ctx).textTheme.titleSmall),
@@ -103,7 +103,14 @@ class TimerSettings extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
+    pomodoroTime = sl<TimeConverter>().secondToMinutes(
+        (context.read<TimerBloc>().state as TimerLoaded).timer.pomodoroTime);
+    breakTime = sl<TimeConverter>().secondToMinutes(
+        (context.read<TimerBloc>().state as TimerLoaded).timer.breakTime);
+    longBreakTime = sl<TimeConverter>().secondToMinutes(
+        (context.read<TimerBloc>().state as TimerLoaded).timer.longBreak);
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
