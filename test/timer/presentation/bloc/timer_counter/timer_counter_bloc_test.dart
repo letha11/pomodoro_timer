@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:clock/clock.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -33,6 +34,7 @@ void main() {
   late StreamController<TimerEntity> timerEntityController;
   late TimeConverter timeConverter;
   late GetStorageTimerUsecase getStorageTimerUsecase;
+  late int timeStamps;
 
   setUp(() {
     countdown = MockCountdown();
@@ -40,18 +42,21 @@ void main() {
     timerEntityController = StreamController<TimerEntity>();
     timeConverter = MockTimeConverter();
     getStorageTimerUsecase = MockGetStorageTimerUsecase();
+    timeStamps = Clock.fixed(DateTime(2022,09,01)).now().millisecondsSinceEpoch;
 
     when(timeConverter.fromSeconds(timer.pomodoroTime)).thenReturn('00:05');
     when(timeConverter.fromSeconds(timer.breakTime)).thenReturn("00:03");
     when(getStorageTimerUsecase())
         .thenAnswer((_) => timerEntityController.stream);
 
-    bloc = TimerCounterBloc(
-      getStorageTimerUsecase: getStorageTimerUsecase,
-      countdown: countdown,
-      streamSubscription: subscription,
-      timeConverter: timeConverter,
-    );
+    bloc = withClock(
+        Clock.fixed(DateTime(2022,09,01)),
+        () => TimerCounterBloc(
+              getStorageTimerUsecase: getStorageTimerUsecase,
+              countdown: countdown,
+              streamSubscription: subscription,
+              timeConverter: timeConverter,
+            ));
 
     timerEntityController.add(timer);
   });
@@ -74,7 +79,7 @@ void main() {
   test(
     'initialState of bloc should be TimerCounterInitial by default',
     () {
-      expect(bloc.state, equals(TimerCounterInitial('00:05')));
+      expect(bloc.state, equals(TimerCounterInitial('00:05', timeStamps)));
     },
   );
 
@@ -195,7 +200,7 @@ void main() {
       },
       expect: () => <TimerCounterState>[
         TimerCounterInProgress("00:05"), // start of the stream
-        TimerCounterInitial("00:03"),
+        TimerCounterInitial("00:03", timeStamps),
       ],
     );
   });
@@ -293,14 +298,14 @@ void main() {
       seed: () => TimerCounterInProgress("00:03"),
       act: (b) => b.add(TimerCounterReset()),
       expect: () => <TimerCounterState>[
-        TimerCounterInitial("00:05")
+        TimerCounterInitial("00:05", timeStamps)
       ], // this TimerCounterInitial depend on timer.pomodoro
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should NOT emit TimerCounterInitial(do nothing) when `state` is TimerCounterInitial',
       build: () => bloc,
-      seed: () => TimerCounterInitial("00:00"),
+      seed: () => TimerCounterInitial("00:00", timeStamps),
       act: (b) => b.add(TimerCounterReset()),
       expect: () => <TimerCounterState>[],
     );
@@ -320,33 +325,44 @@ void main() {
       when(timeConverter.fromSeconds(4)).thenReturn("00:04");
     });
 
-    blocTest<TimerCounterBloc, TimerCounterState>(
-      'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
-      build: () => bloc..type = TimerType.breakTime,
-      seed: () => TimerCounterInProgress(
-          "00:02"), // needed this if not seeded the bloc will not emit anything
-      act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
-      expect: () => <TimerCounterState>[TimerCounterInitial("00:03")],
+    withClock(
+      Clock.fixed(DateTime(2020, 09, 1)),
+      () => blocTest<TimerCounterBloc, TimerCounterState>(
+        'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
+        build: () => bloc..type = TimerType.breakTime,
+        seed: () => TimerCounterInProgress(
+            "00:02"), // needed this if not seeded the bloc will not emit anything
+        act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
+        expect: () =>
+            <TimerCounterState>[TimerCounterInitial("00:03", timeStamps)],
+      ),
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit TimerCounterInitial with breakTime value when type is TimerType.breakTime',
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.breakTime)),
-      expect: () => <TimerCounterState>[TimerCounterInitial("00:02")],
+      seed: () => TimerCounterInProgress(
+          "00:02"), // needed because from the concept i didn't use equatable in TimerCounterInitial
+      // expect: () => [],
+      expect: () =>
+          <TimerCounterState>[TimerCounterInitial("00:02", timeStamps)],
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should emit TimerCounterInitial with longBreak value when type is TimerType.longBreak',
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.longBreak)),
-      expect: () => <TimerCounterState>[TimerCounterInitial("00:04")],
+      seed: () => TimerCounterInProgress(
+          "00:02"), // needed because from the concept i didn't use equatable in TimerCounterInitial
+      expect: () =>
+          <TimerCounterState>[TimerCounterInitial("00:04", timeStamps)],
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
       'should NOT DO ANYTHING when the given type are the same as the current type',
       build: () => bloc..type = TimerType.pomodoro,
-      seed: () => TimerCounterInitial("00:00"),
+      seed: () => TimerCounterInitial("00:00", timeStamps),
       act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
       expect: () => <TimerCounterState>[],
     );

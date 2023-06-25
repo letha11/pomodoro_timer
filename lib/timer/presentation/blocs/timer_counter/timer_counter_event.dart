@@ -25,12 +25,6 @@ class TimerCounterTypeChange extends TimerCounterEvent {
   final TimerType type;
 }
 
-class TimerCounterChange extends TimerCounterEvent {
-  const TimerCounterChange(this.timer);
-
-  final TimerEntity timer;
-}
-
 /// Inform TimerBloc that a tick has occurred and that it needs to update its state accordingly
 class _TimerCounterTicked extends TimerCounterEvent {
   const _TimerCounterTicked({required this.formattedDuration});

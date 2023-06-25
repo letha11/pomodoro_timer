@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:clock/clock.dart';
 
 import '../../../../core/utils/countdown.dart';
 import '../../../../core/utils/time_converter.dart';
@@ -43,6 +44,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
   StreamSubscription<int>? _countdownSubscription;
   int _duration = 0;
+  // int _timeStamps = DateTime.now().millisecondsSinceEpoch;
+  int _timeStamps = clock.now().millisecondsSinceEpoch;
   late final StreamSubscription<TimerEntity> _timerSubscription;
 
   TimerCounterBloc({
@@ -55,7 +58,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         _countdownSubscription = streamSubscription,
         _logger = logger,
         _getStorageTimerUsecase = getStorageTimerUsecase,
-        super(const TimerCounterInitial('00:00')) {
+        super(const TimerCounterInitial('00:00', 0)) {
     _subscribeTimer();
 
     on<TimerCounterStarted>(_onTimerStarted);
@@ -63,7 +66,6 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     on<TimerCounterResumed>(_onTimerResumed);
     on<TimerCounterReset>(_onTimerReset);
     on<TimerCounterTypeChange>(_onTimerTypeChange);
-    on<TimerCounterChange>(_onTimerChange);
 
     on<_TimerCounterTicked>(_onTimerTicked);
   }
@@ -87,7 +89,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
       // ignore: invalid_use_of_visible_for_testing_member
       emit(
-        TimerCounterInitial(timeConverter.fromSeconds(_duration)),
+        TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps),
       );
     });
   }
@@ -159,7 +161,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     if (state is! TimerCounterInitial) {
       _countdownSubscription?.cancel();
 
-      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
+      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps));
     }
   }
 
@@ -169,24 +171,17 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         "TimerCounterChange event get sent, [type: ${event.type}, currentType: $type]");
 
     if (type != event.type) {
+      
+      // _timeStamps = DateTime.now().millisecondsSinceEpoch; // reassign
+      _timeStamps = clock.now().millisecondsSinceEpoch; // reassign
+      
       _countdownSubscription?.cancel();
 
       _setDurationByType(event.type);
 
-      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
+
+      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps));
     }
-  }
-
-  _onTimerChange(TimerCounterChange event, Emitter<TimerCounterState> emit) {
-    _logger?.log(Level.debug,
-        "TimerCounterChange event get sent, [timer: ${event.timer}]");
-
-    _countdownSubscription?.cancel();
-
-    timer = event.timer;
-    _setDurationByType();
-
-    emit(TimerCounterInitial(timeConverter.fromSeconds(_duration)));
   }
 
   _onTimerTicked(_TimerCounterTicked event, Emitter<TimerCounterState> emit) {

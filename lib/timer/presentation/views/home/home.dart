@@ -103,20 +103,16 @@ class _HomeState extends State<Home> {
               TimerTypeWidget(),
               const SizedBox(height: 33),
               BlocBuilder<TimerCounterBloc, TimerCounterState>(
-                builder: (context, state) {
-                  return StyledContainer(
-                    width: 125,
-                    text: state.duration,
-                    textStyle: Theme.of(context).textTheme.bodyLarge,
-                    padding: const EdgeInsets.only(bottom: 5),
-                  );
-                },
+                builder: (context, state) => StyledContainer(
+                  width: 125,
+                  text: state.duration,
+                  textStyle: Theme.of(context).textTheme.bodyLarge,
+                  padding: const EdgeInsets.only(bottom: 5),
+                ),
               ),
               const SizedBox(height: 33),
               BlocBuilder<TimerCounterBloc, TimerCounterState>(
-                builder: (context, state) {
-                  return _actionsWidget(state);
-                },
+                builder: (context, state) => _actionsWidget(state),
               ),
             ],
           ),
@@ -213,6 +209,8 @@ class TimerTypeWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: _tabs.map((e) {
         int index = _tabs.indexOf(e);
+        // print(activeIndex);
+        // print(index);
 
         return Padding(
           padding:

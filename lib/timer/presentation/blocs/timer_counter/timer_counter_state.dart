@@ -5,6 +5,7 @@ abstract class TimerCounterState extends Equatable {
   const TimerCounterState(this.duration);
   final String duration;
 
+
   @override
   List<Object?> get props => [duration];
 }
@@ -14,10 +15,26 @@ class TimerCounterUninitialized extends TimerCounterState {
 }
 
 class TimerCounterInitial extends TimerCounterState {
-  const TimerCounterInitial(super.duration);
+  const TimerCounterInitial(super.duration, this.timeStamps);
+
+  final int timeStamps;
 
   @override
-  toString() => 'TimerInitial { duration: $duration } ';
+  List<Object?> get props => [duration, timeStamps];
+  
+
+  // @override
+  // bool operator ==(Object other) => false;
+  //
+  // @override
+  // // ignore: unnecessary_overrides
+  // int get hashCode => super.hashCode;
+
+  // @override
+  // List<Object?> get props => [duration, identityHashCode(this)];
+
+  @override
+  toString() => 'TimerInitial { duration: $duration, timeStamps: $timeStamps } ';
 }
 
 class TimerCounterInProgress extends TimerCounterState {
