@@ -209,9 +209,6 @@ class TimerTypeWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: _tabs.map((e) {
         int index = _tabs.indexOf(e);
-        // print(activeIndex);
-        // print(index);
-
         return Padding(
           padding:
               EdgeInsets.only(right: index != (_tabs.length - 1) ? 20.0 : 0.0),

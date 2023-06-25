@@ -44,7 +44,6 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
   StreamSubscription<int>? _countdownSubscription;
   int _duration = 0;
-  // int _timeStamps = DateTime.now().millisecondsSinceEpoch;
   int _timeStamps = clock.now().millisecondsSinceEpoch;
   late final StreamSubscription<TimerEntity> _timerSubscription;
 
@@ -172,7 +171,6 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
     if (type != event.type) {
       
-      // _timeStamps = DateTime.now().millisecondsSinceEpoch; // reassign
       _timeStamps = clock.now().millisecondsSinceEpoch; // reassign
       
       _countdownSubscription?.cancel();
