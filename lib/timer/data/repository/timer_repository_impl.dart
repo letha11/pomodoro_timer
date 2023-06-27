@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-
 import '../../data/datasource/local/timer_repository_db.dart';
 import '../../domain/entity/timer_entity.dart';
 import '../../../../core/success.dart';

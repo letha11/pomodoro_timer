@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:clock/clock.dart';
 
+import '../../../../core/utils/audio_player.dart';
 import '../../../../core/utils/countdown.dart';
 import '../../../../core/utils/time_converter.dart';
 import '../../../domain/entity/timer_entity.dart';
@@ -37,6 +38,7 @@ extension TTToString on TimerType {
 class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final Countdown _countdown;
   final ILogger? _logger;
+  final AudioPlayerL _audioPlayer;
   final TimeConverter timeConverter;
   final GetStorageTimerUsecase _getStorageTimerUsecase;
   late TimerEntity timer;
@@ -51,10 +53,12 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     required Countdown countdown,
     required this.timeConverter,
     required GetStorageTimerUsecase getStorageTimerUsecase,
+    required AudioPlayerL audioPlayer,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
         _countdownSubscription = streamSubscription,
+        _audioPlayer = audioPlayer,
         _logger = logger,
         _getStorageTimerUsecase = getStorageTimerUsecase,
         super(const TimerCounterInitial('00:00', 0)) {
@@ -101,6 +105,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     /// cancel the subscription if there are any
     if (state is! TimerCounterInProgress && state is! TimerCounterPause) {
       _countdownSubscription?.cancel();
+      _audioPlayer.stopSound();
 
       await _countdown.count(_duration - 1).fold(
         (err) {
@@ -119,6 +124,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
           }, onDone: () async {
             _logger?.log(Level.debug, "Stream Finished");
             await Future.delayed(const Duration(seconds: 1));
+
+            _audioPlayer.playSound("assets/audio/alarm.wav");
             // will change _duration into breakTime
             if (type == TimerType.pomodoro) {
               _setDurationByType(TimerType.breakTime);

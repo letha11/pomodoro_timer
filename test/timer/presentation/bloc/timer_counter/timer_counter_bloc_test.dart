@@ -6,9 +6,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:clock/clock.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
+import 'package:pomodoro_timer/core/utils/audio_player.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/time_converter.dart';
@@ -20,7 +22,8 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_coun
   MockSpec<Countdown>(),
   MockSpec<StreamSubscription<int>>(),
   MockSpec<TimeConverter>(),
-  MockSpec<GetStorageTimerUsecase>()
+  MockSpec<GetStorageTimerUsecase>(),
+  MockSpec<AudioPlayer>()
 ])
 import 'timer_counter_bloc_test.mocks.dart';
 
@@ -35,6 +38,7 @@ void main() {
   late TimeConverter timeConverter;
   late GetStorageTimerUsecase getStorageTimerUsecase;
   late int timeStamps;
+  late AudioPlayerL audioPlayer;
 
   setUp(() {
     countdown = MockCountdown();
@@ -43,6 +47,7 @@ void main() {
     timeConverter = MockTimeConverter();
     getStorageTimerUsecase = MockGetStorageTimerUsecase();
     timeStamps = Clock.fixed(DateTime(2022,09,01)).now().millisecondsSinceEpoch;
+    audioPlayer = AudioPlayerLImpl(player: MockAudioPlayer());
 
     when(timeConverter.fromSeconds(timer.pomodoroTime)).thenReturn('00:05');
     when(timeConverter.fromSeconds(timer.breakTime)).thenReturn("00:03");
@@ -55,6 +60,7 @@ void main() {
               getStorageTimerUsecase: getStorageTimerUsecase,
               countdown: countdown,
               streamSubscription: subscription,
+              audioPlayer: audioPlayer,
               timeConverter: timeConverter,
             ));
 
@@ -202,6 +208,10 @@ void main() {
         TimerCounterInProgress("00:05"), // start of the stream
         TimerCounterInitial("00:03", timeStamps),
       ],
+      verify: (_) {
+        verify(audioPlayer.stopSound()).called(1);
+        verify(audioPlayer.playSound("assets/audio/alarm.wav")).called(1);
+      },
     );
   });
 

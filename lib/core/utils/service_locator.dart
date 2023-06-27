@@ -8,6 +8,7 @@ import '../../timer/domain/usecase/usecases.dart';
 import '../../timer/data/repository/timer_storage_repository_impl.dart';
 import '../../timer/presentation/blocs/timer/timer_bloc.dart';
 import '../../timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
+import 'audio_player.dart';
 import 'countdown.dart';
 import 'logger.dart';
 import 'time_converter.dart';
@@ -19,6 +20,7 @@ void init() {
   // Utils
   sl.registerLazySingleton(() => const Countdown());
   sl.registerLazySingleton(() => TimeConverter());
+  sl.registerLazySingleton<AudioPlayerL>(() => AudioPlayerLImpl());
   sl.registerLazySingleton<ILogger>(() => LoggerImpl());
 
   // Repository
@@ -58,14 +60,7 @@ void init() {
       timeConverter: sl(),
       logger: sl(),
       getStorageTimerUsecase: sl(),
+      audioPlayer: sl(),
     ),
   );
-  // sl.registerFactoryParam<TimerCounterBloc, TimerEntity, dynamic>(
-  //   (timer, _) => TimerCounterBloc(
-  //     countdown: sl(),
-  //     timeConverter: sl(),
-  //     logger: sl(),
-  //     timer: timer,
-  //   ),
-  // );
 }
