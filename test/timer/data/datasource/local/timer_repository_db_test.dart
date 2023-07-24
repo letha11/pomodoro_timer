@@ -17,6 +17,11 @@ import '../../../../test_utils.dart';
 import 'timer_repository_db_test.mocks.dart';
 
 void main() {
+  const pomodoroTime = 1000;
+  const breakTime = 500;
+  const longBreak = 900;
+
+
   late TimerRepositoryHiveDB timerRepository;
   late HiveInterface hive;
   late MockBox box;
@@ -60,64 +65,59 @@ void main() {
   });
 
   group('setTimer', () {
-    const pomodoroTime = 1000;
-    const breakTime = 500;
-
     test(
         'should store pomodoroTime into \'pomodoro_time\' when only pomodoroTime given',
         () {
-      // arrange
-      when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
-
       // act
       timerRepository.setTimer(pomodoroTime: pomodoroTime);
 
       // assert
       verify(box.put('pomodoro_time', pomodoroTime)).called(1);
       verifyNever(box.put('break_time', any));
-      expect(box.get('pomodoro_time'), pomodoroTime);
+      verifyNever(box.put('long_break', any));
     });
 
     test('should store \'break_time\' when only breakTime given', () {
-      // arrange
-      when(box.get('break_time')).thenReturn(breakTime);
-
       // act
       timerRepository.setTimer(breakTime: breakTime);
 
       // assert
       verify(box.put('break_time', breakTime)).called(1);
       verifyNever(box.put('pomodoro_time', any));
-      expect(box.get('break_time'), breakTime);
+      verifyNever(box.put('long_break', any));
     });
 
-    test(
-        'should store both pomodoroTime and breakTime when both parameters given',
-        () {
-      // arrange
-      when(box.get('break_time')).thenReturn(breakTime);
-      when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
+    test('should store \'long_break\' when only longBreak given', () {
+      // act
+      timerRepository.setTimer(longBreak: longBreak);
 
+      // assert
+      verify(box.put('long_break', longBreak)).called(1);
+      verifyNever(box.put('pomodoro_time', any));
+      verifyNever(box.put('break_time', any));
+    });
+
+    test('should store all of them when all the parameters were given', () {
       // act
       timerRepository.setTimer(
-          pomodoroTime: pomodoroTime, breakTime: breakTime);
+        pomodoroTime: pomodoroTime,
+        breakTime: breakTime,
+        longBreak: longBreak,
+      );
 
       // assert
       verify(box.put('break_time', breakTime)).called(1);
       verify(box.put('pomodoro_time', pomodoroTime)).called(1);
-      expect(box.get('break_time'), breakTime);
-      expect(box.get('pomodoro_time'), pomodoroTime);
+      verify(box.put('long_break', longBreak)).called(1);
     });
   });
 
   group('getTimer', () {
-    const pomodoroTime = 1000;
-    const breakTime = 500;
-
     test('should retrieve TimerModel', () {
       // arrange
       when(box.get('break_time')).thenReturn(breakTime);
       when(box.get('pomodoro_time')).thenReturn(pomodoroTime);
+      when(box.get('long_break')).thenReturn(longBreak);
 
       // act
       final result = timerRepository.getTimer();
@@ -126,7 +126,8 @@ void main() {
           result,
           isA<TimerModel>()
               .having((p0) => p0.breakTime, 'breakTime', breakTime)
-              .having((p0) => p0.pomodoroTime, 'pomodoroTime', pomodoroTime));
+              .having((p0) => p0.pomodoroTime, 'pomodoroTime', pomodoroTime)
+              .having((p0) => p0.longBreak, 'longBreak', longBreak));
     });
   });
 }

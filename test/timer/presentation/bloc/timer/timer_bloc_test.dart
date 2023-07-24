@@ -121,6 +121,7 @@ void main() {
         setTimerUsecase(
           pomodoroTime: anyNamed('pomodoroTime'),
           breakTime: anyNamed('breakTime'),
+          longBreak: anyNamed('longBreak'),
         ),
       ).thenAnswer((realInvocation) async => Right(Success())),
       act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3, longBreak: 4)),

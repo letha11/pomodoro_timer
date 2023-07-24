@@ -7,6 +7,7 @@ import '../../../domain/entity/timer_entity.dart';
 import '../../../domain/usecase/usecases.dart';
 
 part 'timer_event.dart';
+
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
@@ -61,7 +62,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     /// sent an TimerGet event, so the state will be TimerLoaded/TimerFailure.
     if (state is TimerLoaded) {
       final ts = await _setTimerUsecase.call(
-          pomodoroTime: event.pomodoroTime, breakTime: event.breakTime);
+        pomodoroTime: event.pomodoroTime,
+        breakTime: event.breakTime,
+        longBreak: event.longBreak,
+      );
 
       emit(
         ts.fold(

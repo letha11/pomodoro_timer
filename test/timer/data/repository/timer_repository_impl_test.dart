@@ -10,7 +10,6 @@ import 'package:pomodoro_timer/timer/data/repository/timer_repository_impl.dart'
 
 @GenerateNiceMocks([MockSpec<TimerRepositoryHiveDB>()])
 import 'timer_repository_impl_test.mocks.dart';
-// class MockTimerRepositoryDB extends Mock implements TimerRepositoryHiveDB {}
 
 void main() {
   late TimerRepositoryImpl timerRepository;
@@ -57,23 +56,32 @@ void main() {
   group('setTimer', () {
     const pomodoroTime = 1000;
     const breakTime = 300;
+    const longBreak = 900;
+
     test('should return Right(TimerEntity) when success', () async {
       final result = await timerRepository.setTimer(
-          pomodoroTime: pomodoroTime, breakTime: breakTime);
+          pomodoroTime: pomodoroTime,
+          breakTime: breakTime,
+          longBreak: longBreak);
 
       verify(timerRepositoryDB.setTimer(
-              pomodoroTime: pomodoroTime, breakTime: breakTime))
-          .called(1);
+        pomodoroTime: pomodoroTime,
+        breakTime: breakTime,
+        longBreak: longBreak,
+      )).called(1);
       expect(result, equals(Right(Success())));
     });
 
     test(
         'should return Left(Failure) when _DBRepository.setTimer() throws an Exception',
         () async {
-      when(timerRepositoryDB.setTimer(
-              pomodoroTime: anyNamed('pomodoroTime'),
-              breakTime: anyNamed('breakTime')))
-          .thenThrow(Exception('woopsie'));
+      // we dont need all of the parameters for this test to be valid
+      when(
+        timerRepositoryDB.setTimer(
+          pomodoroTime: anyNamed('pomodoroTime'),
+          breakTime: anyNamed('breakTime'),
+        ),
+      ).thenThrow(Exception('woopsie'));
 
       final result = await timerRepository.setTimer(
           pomodoroTime: pomodoroTime, breakTime: breakTime);

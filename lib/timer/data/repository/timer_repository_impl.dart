@@ -32,7 +32,7 @@ class TimerRepositoryImpl implements TimerRepository {
   Future<Either<Failure, Success>> setTimer(
       {int? pomodoroTime, int? breakTime, int? longBreak}) async {
     try {
-      _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime);
+      _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime, longBreak: longBreak);
 
       return Right(Success());
     } catch (e) {
