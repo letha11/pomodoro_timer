@@ -10,9 +10,10 @@ class TimerRepositoryImpl implements TimerRepository {
   final TimerRepositoryDB _dbRepository;
   final ILogger? _logger;
 
-  TimerRepositoryImpl(
-      {required TimerRepositoryDB timerRepositoryDB, ILogger? logger})
-      : _dbRepository = timerRepositoryDB,
+  TimerRepositoryImpl({
+    required TimerRepositoryDB timerRepositoryDB,
+    ILogger? logger,
+  })  : _dbRepository = timerRepositoryDB,
         _logger = logger;
 
   @override
@@ -32,7 +33,10 @@ class TimerRepositoryImpl implements TimerRepository {
   Future<Either<Failure, Success>> setTimer(
       {int? pomodoroTime, int? breakTime, int? longBreak}) async {
     try {
-      _dbRepository.setTimer(pomodoroTime: pomodoroTime, breakTime: breakTime, longBreak: longBreak);
+      _dbRepository.setTimer(
+          pomodoroTime: pomodoroTime,
+          breakTime: breakTime,
+          longBreak: longBreak);
 
       return Right(Success());
     } catch (e) {

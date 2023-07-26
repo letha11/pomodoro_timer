@@ -23,6 +23,11 @@ class TimerRepositoryHiveDB implements TimerRepositoryDB {
     box = await _hive.openBox('timer');
   }
 
+  // Why I'm doing this complex/hard way to create an instance of this class are
+  // because i want to run an asynchronous method when we create this class.
+  // if we use a standard `ClassName() {}` constructor, it won't let us run an asynchronous method.
+  // DISCLAIMER: well you can but you cannot await those method to finished or using `await` keyword
+  // on the constructor.
   static Future<TimerRepositoryHiveDB> create(
       {HiveInterface? hive, ILogger? logger}) async {
     final timerRepositoryDB =

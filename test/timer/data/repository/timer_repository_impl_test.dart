@@ -7,12 +7,13 @@ import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/timer_repository_db.dart';
 import 'package:pomodoro_timer/timer/data/models/timer_model.dart';
 import 'package:pomodoro_timer/timer/data/repository/timer_repository_impl.dart';
+import 'package:pomodoro_timer/timer/domain/repository/timer_repository.dart';
 
 @GenerateNiceMocks([MockSpec<TimerRepositoryHiveDB>()])
 import 'timer_repository_impl_test.mocks.dart';
 
 void main() {
-  late TimerRepositoryImpl timerRepository;
+  late TimerRepository timerRepository;
   late TimerRepositoryDB timerRepositoryDB;
   late TimerModel timer;
 
@@ -58,7 +59,7 @@ void main() {
     const breakTime = 300;
     const longBreak = 900;
 
-    test('should return Right(TimerEntity) when success', () async {
+    test('should return Right(Success) when success', () async {
       final result = await timerRepository.setTimer(
           pomodoroTime: pomodoroTime,
           breakTime: breakTime,
