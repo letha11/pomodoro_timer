@@ -9,6 +9,7 @@ import '../../blocs/timer/timer_bloc.dart';
 import '../../widgets/styled_container.dart';
 import 'widgets/title_switch.dart';
 
+// ignore: must_be_immutable
 class TimerSettings extends StatelessWidget {
   TimerSettings({
     Key? key,

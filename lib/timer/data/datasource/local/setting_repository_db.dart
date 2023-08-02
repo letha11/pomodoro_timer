@@ -4,7 +4,7 @@ import 'package:pomodoro_timer/core/utils/logger.dart';
 import '../../models/setting_model.dart';
 
 abstract class SettingRepositoryDB {
-  void store(SettingModel model);
+  void store({bool? pomodoroSequence, bool? playSound});
 
   SettingModel get();
 }
@@ -45,10 +45,13 @@ class SettingRepositoryHiveDB implements SettingRepositoryDB {
   }
 
   @override
-  void store(SettingModel model) {
-    _logger?.log(Level.info, '[$this(storeSetting)]: ${model.toJson()}');
+  void store({bool? pomodoroSequence, bool? playSound}) {
+    _logger?.log(Level.info, '''[$this(storeSetting)]: {
+      pomodoroSequence: $pomodoroSequence,
+      playSound: $playSound,
+    }''');
 
-    box.put('pomodoro_sequence', model.pomodoroSequence);
-    box.put('play_sound', model.playSound);
+    if(pomodoroSequence != null) box.put('pomodoro_sequence', pomodoroSequence);
+    if(playSound != null) box.put('play_sound', playSound);
   }
 }

@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
-import 'package:pomodoro_timer/timer/data/models/setting_model.dart';
 
 import '../../../core/exceptions/failures.dart';
 import '../../../core/success.dart';
@@ -32,14 +31,13 @@ class SettingRepositoryImpl implements SettingRepository {
   }
 
   @override
-  Future<Either<Failure, Success>> storeSetting(SettingEntity entity) async {
+  Future<Either<Failure, Success>> storeSetting({bool? pomodoroSequence, bool? playSound}) async {
     try {
-      final model = SettingModel(
-        pomodoroSequence: entity.pomodoroSequence,
-        playSound: entity.playSound,
-      );
 
-      _dbRepository.store(model);
+      _dbRepository.store(
+        pomodoroSequence: pomodoroSequence,
+        playSound: playSound,
+      );
 
       return Right(Success());
     } catch (e) {

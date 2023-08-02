@@ -6,5 +6,5 @@ import '../entity/setting_entity.dart';
 
 abstract class SettingRepository {
   Future<Either<Failure, SettingEntity>> getSetting();
-  Future<Either<Failure, Success>> storeSetting(SettingEntity entity);
+  Future<Either<Failure, Success>> storeSetting({bool? pomodoroSequence, bool? playSound});
 }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -62,17 +60,17 @@ void main() {
 
   group('storeSetting', () {
     test('should return Right(Success) when success storing', () async {
-      final result = await settingRepository.storeSetting(setting);
+      final result = await settingRepository.storeSetting();
 
-      verify(settingRepositoryDB.store(setting)).called(1);
+      verify(settingRepositoryDB.store()).called(1);
       expect(result, equals(Right(Success())));
       expect((result as Right).value, isA<Success>());
     });
 
     test('should return Left(Failure) when failed storing', () async {
-      when(settingRepositoryDB.store(setting)).thenThrow(Exception('oops'));
+      when(settingRepositoryDB.store()).thenThrow(Exception('oops'));
 
-      final result = await settingRepository.storeSetting(setting);
+      final result = await settingRepository.storeSetting();
 
       expect(result, equals(Left(UnhandledFailure())));
     });

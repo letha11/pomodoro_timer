@@ -58,15 +58,29 @@ void main() {
   });
 
   group('store', () {
-    test('should call `.put` method on every field in the given model', () {
-      final jsonModel = setting.toJson();
-      final keys = jsonModel.keys;
+    test("should only store pomodoroSequence when only pomodoroSequence given",
+        () {
+      settingRepository.store(pomodoroSequence: true);
 
-      settingRepository.store(setting);
+      verify(box.put("pomodoro_sequence", any)).called(1);
+      verifyNever(box.put("play_sound", any));
+    });
 
-      for (var key in keys) {
-        verify(box.put(key, jsonModel[key])).called(1);
-      }
+    test("should only store playSound when only playSound given", () {
+      settingRepository.store(playSound: true);
+
+      verify(box.put("play_sound", any)).called(1);
+      verifyNever(box.put("pomodoro_sequence", any));
+    });
+
+    test("should store all when all parameters given", () {
+      settingRepository.store(
+        pomodoroSequence: true,
+        playSound: true,
+      );
+
+      verify(box.put("play_sound", any)).called(1);
+      verify(box.put("pomodoro_sequence", any)).called(1);
     });
   });
 

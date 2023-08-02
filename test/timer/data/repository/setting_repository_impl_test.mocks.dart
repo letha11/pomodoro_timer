@@ -87,10 +87,18 @@ class MockSettingRepositoryHiveDB extends _i1.Mock
         ),
       ) as _i3.SettingModel);
   @override
-  void store(_i3.SettingModel? model) => super.noSuchMethod(
+  void store({
+    bool? pomodoroSequence,
+    bool? playSound,
+  }) =>
+      super.noSuchMethod(
         Invocation.method(
           #store,
-          [model],
+          [],
+          {
+            #pomodoroSequence: pomodoroSequence,
+            #playSound: playSound,
+          },
         ),
         returnValueForMissingStub: null,
       );
