@@ -33,7 +33,6 @@ class SettingRepositoryImpl implements SettingRepository {
   @override
   Future<Either<Failure, Success>> storeSetting({bool? pomodoroSequence, bool? playSound}) async {
     try {
-
       _dbRepository.store(
         pomodoroSequence: pomodoroSequence,
         playSound: playSound,

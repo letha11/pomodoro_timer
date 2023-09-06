@@ -107,6 +107,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
       _countdownSubscription?.cancel();
       _audioPlayer.stopSound();
 
+      // if(Setting.pomodoroSequence) {.. do something else}?
+    
       await _countdown.count(_duration - 1).fold(
         (err) {
           _logger?.log(Level.warning, "[count] {duration: $_duration}");
