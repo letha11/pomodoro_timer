@@ -3,29 +3,31 @@ import 'package:hive/hive.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
-import 'package:pomodoro_timer/timer/data/models/setting_model.dart';
+import 'package:pomodoro_timer/timer/data/models/setting_hive_model.dart';
 
 @GenerateNiceMocks([MockSpec<HiveInterface>()])
-@GenerateMocks([Box])
+@GenerateMocks([Box<SettingHiveModel>])
 import 'setting_repository_db_test.mocks.dart';
 
 void main() {
-  const SettingModel setting = SettingModel(
-    pomodoroSequence: true,
-    playSound: true,
-  );
+  SettingHiveModel settingModel = const SettingHiveModel();
 
   late SettingRepositoryHiveDB settingRepository;
   late HiveInterface hive;
-  late MockBox box;
+  late MockBox<SettingHiveModel> box;
 
   setUp(() async {
     hive = MockHiveInterface();
     hive.init('setting');
-    box = MockBox();
+    box = MockBox<SettingHiveModel>();
 
     when(hive.openBox('setting')).thenAnswer((_) async => box);
+    when(box.get(0)).thenReturn(settingModel);
     settingRepository = await SettingRepositoryHiveDB.create(hive: hive);
+  });
+
+  tearDown(() async {
+    await hive.close();
   });
 
   group('constructor', () {
@@ -39,65 +41,88 @@ void main() {
     );
 
     test(
-      'box should be filled when creating a new SettingRepositoryHiveDB instance',
+      'box should be opened and filled when creating a new SettingRepositoryHiveDB instance',
       () async {
         // differentiate this test `hive` and `setUp`
+        final box = MockBox<SettingHiveModel>();
         final hive = MockHiveInterface(); // arrange
 
         // stubbing
         when(hive.openBox('setting')).thenAnswer((realInvocation) async => box);
+        when(box.get(0)).thenReturn(null);
 
         // act
-        final result = await SettingRepositoryHiveDB.create(hive: hive);
+        await SettingRepositoryHiveDB.create(hive: hive);
 
         // arrange
-        expect(result.box, isA<MockBox>());
-        verify(hive.openBox('setting')).called(1);
+        verify(hive.openBox<SettingHiveModel>('setting')).called(1);
+        verify(box.put(0, any)).called(1);
       },
     );
   });
 
-  group('store', () {
-    test("should only store pomodoroSequence when only pomodoroSequence given",
-        () {
-      settingRepository.store(pomodoroSequence: true);
+  group('getTimer', () {
+    test('should return default value when nothing changed', () async {
+      // act
+      TimerSettingModel timerSetting = settingRepository.getTimer();
 
-      verify(box.put("pomodoro_sequence", any)).called(1);
-      verifyNever(box.put("play_sound", any));
-    });
-
-    test("should only store playSound when only playSound given", () {
-      settingRepository.store(playSound: true);
-
-      verify(box.put("play_sound", any)).called(1);
-      verifyNever(box.put("pomodoro_sequence", any));
-    });
-
-    test("should store all when all parameters given", () {
-      settingRepository.store(
-        pomodoroSequence: true,
-        playSound: true,
-      );
-
-      verify(box.put("play_sound", any)).called(1);
-      verify(box.put("pomodoro_sequence", any)).called(1);
+      // assert
+      expect(timerSetting.pomodoroTime, equals(25));
+      expect(timerSetting.shortBreak, equals(5));
+      expect(timerSetting.longBreak, equals(15));
     });
   });
 
-  group('get', () {
-    test('should retreive SettingModel', () {
-      when(box.get('pomodoro_sequence')).thenReturn(setting.pomodoroSequence);
-      when(box.get('play_sound')).thenReturn(setting.playSound);
-
-      final result = settingRepository.get();
-
-      expect(
-        result,
-        isA<SettingModel>()
-            .having((p0) => p0.pomodoroSequence, 'pomodoroSequence',
-                setting.pomodoroSequence)
-            .having((p0) => p0.playSound, 'playSound', setting.playSound),
+  group('storeTimer', () {
+    test(
+        'should call box.put with the changed settingModel to store the changed setting',
+        () {
+      const newSettingModel = SettingHiveModel(
+        timerSetting: TimerSettingModel(
+          pomodoroTime: 30,
+          shortBreak: 15,
+          longBreak: 25,
+        ),
       );
+
+      // stub
+      when(box.get(0)).thenReturn(settingModel);
+
+      settingRepository.storeTimerSetting(
+        pomodoroTime: newSettingModel.timerSetting.pomodoroTime,
+        shortBreak: newSettingModel.timerSetting.shortBreak,
+        longBreak: newSettingModel.timerSetting.longBreak,
+      );
+
+      verify(box.put(0, newSettingModel)).called(1);
+    });
+  });
+
+  group('getSound', () {
+    test('should return default value when nothing changed', () async {
+      // act
+      SoundSettingModel soundSetting = settingRepository.getSound();
+
+      // assert
+      expect(soundSetting.playSound, equals(true));
+      expect(soundSetting.audioPath, equals('assets/audio/alarm.mp3'));
+    });
+  });
+
+  group('storeSound', () {
+    test('should call box.put with the changed settingModel to store the changed setting', () {
+      const newSettingModel = SettingHiveModel(
+        soundSetting: SoundSettingModel(
+          playSound: true,
+          audioPath: 'assets/audio/alarm-new.mp3',
+        ),
+      );
+      settingRepository.storeSoundSetting(
+        playSound: newSettingModel.soundSetting.playSound,
+        audioPath: newSettingModel.soundSetting.audioPath,
+      );
+
+      verify(box.put(0, newSettingModel)).called(1);
     });
   });
 }

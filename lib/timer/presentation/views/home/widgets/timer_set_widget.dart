@@ -50,7 +50,7 @@ class _TimerSetFormState extends State<TimerSetForm> {
                     controller: _breakTimeController
                       ..text = (context.read<TimerBloc>().state as TimerLoaded)
                           .timer
-                          .breakTime
+                          .shortBreak
                           .toString(),
                   ),
                 ),
@@ -69,7 +69,7 @@ class _TimerSetFormState extends State<TimerSetForm> {
                   context.read<TimerBloc>().add(
                         TimerSet(
                           pomodoroTime: int.parse(_pomodoroTimeController.text),
-                          breakTime: int.parse(_breakTimeController.text),
+                          shortBreak: int.parse(_breakTimeController.text),
                         ),
                       );
                 }

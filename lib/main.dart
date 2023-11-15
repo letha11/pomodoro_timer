@@ -6,6 +6,7 @@ import 'package:hive_flutter/adapters.dart';
 
 import 'core/utils/service_locator.dart';
 import 'firebase_options.dart';
+import 'timer/data/models/setting_hive_model.dart';
 import 'timer/presentation/blocs/timer/timer_bloc.dart';
 import 'timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'timer/presentation/views/home/home.dart';
@@ -13,8 +14,10 @@ import 'timer/presentation/views/home/home.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // initialize hive
   await Hive.initFlutter();
+  Hive.registerAdapter(SoundSettingModelAdapter());
+  Hive.registerAdapter(TimerSettingModelAdapter());
+  Hive.registerAdapter(SettingHiveModelAdapter());
 
   // initialize service locator
   init();
@@ -60,6 +63,11 @@ class App extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         fontFamily: "Darker Grotesque",
+        appBarTheme: const AppBarTheme(
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+        ),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(
             fontSize: 36,
@@ -75,7 +83,7 @@ class App extends StatelessWidget {
             fontSize: 16,
             fontWeight: FontWeight.w500, // SemiBold
             color: Color(0xFF515151),
-          ), 
+          ),
         ),
       ),
       home: SafeArea(

@@ -13,9 +13,6 @@ import 'widgets/title_switch.dart';
 class TimerSettings extends StatelessWidget {
   TimerSettings({
     Key? key,
-    // required this.pomodoroTime,
-    // required this.breakTime,
-    // required this.longBreakTime,
   }) : super(key: key);
 
   late int pomodoroTime;
@@ -35,7 +32,7 @@ class TimerSettings extends StatelessWidget {
             pomodoroTime: sl<TimeConverter>().minuteToSecond(
               int.parse(_pomodoroTimeController.text),
             ),
-            breakTime: sl<TimeConverter>().minuteToSecond(
+            shortBreak: sl<TimeConverter>().minuteToSecond(
               int.parse(_breakTimeController.text),
             ),
             longBreak: sl<TimeConverter>().minuteToSecond(
@@ -74,6 +71,7 @@ class TimerSettings extends StatelessWidget {
             cursorColor: Colors.black,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+
             onChanged: (val) {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
               _debounce = Timer(const Duration(seconds: 2), () {
@@ -108,7 +106,7 @@ Widget build(BuildContext context) {
     pomodoroTime = sl<TimeConverter>().secondToMinutes(
         (context.read<TimerBloc>().state as TimerLoaded).timer.pomodoroTime);
     breakTime = sl<TimeConverter>().secondToMinutes(
-        (context.read<TimerBloc>().state as TimerLoaded).timer.breakTime);
+        (context.read<TimerBloc>().state as TimerLoaded).timer.shortBreak);
     longBreakTime = sl<TimeConverter>().secondToMinutes(
         (context.read<TimerBloc>().state as TimerLoaded).timer.longBreak);
 
@@ -128,7 +126,7 @@ Widget build(BuildContext context) {
                 ),
                 _timeForm(
                   context,
-                  'break',
+                  'shortbreak',
                   _breakTimeController..text = "$breakTime",
                 ),
                 _timeForm(

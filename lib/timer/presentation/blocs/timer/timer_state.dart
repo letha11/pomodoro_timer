@@ -12,12 +12,12 @@ class TimerInitial extends TimerState {}
 class TimerLoading extends TimerState {}
 
 class TimerLoaded extends TimerState {
-  final TimerEntity timer;
+  final TimerSettingEntity timer;
   final ErrorObject? error;
 
   const TimerLoaded({required this.timer, this.error});
 
-  TimerLoaded copyWith({TimerEntity? timer, ErrorObject? error}) => TimerLoaded(
+  TimerLoaded copyWith({TimerSettingEntity? timer, ErrorObject? error}) => TimerLoaded(
         timer: timer ?? this.timer,
         error: error,
       );

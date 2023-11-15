@@ -31,46 +31,21 @@ class HomeScreen extends StatelessWidget {
                     content: Text(state.error.message!),
                   ),
                 );
-              }
-            },
-            buildWhen: (previous, current) {
-              if (previous is TimerLoaded && current is TimerLoaded) {
-                if (previous.timer != current.timer) {
-                  return true;
-                } else {
-                  return false;
-                }
-              } else if (current is TimerLoaded) {
-                return true;
-              } else if (current is TimerFailed) {
-                return true;
-              } else {
-                return false;
+              } else if (state is TimerLoaded && state.error != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error!.message!),
+                  ),
+                );
               }
             },
             builder: (context, state) {
               if (state is TimerLoaded) {
-                // Success
-                /// Will create a `TimerCounterBloc` instance everytime `TimerLoaded` state get emitted
-
-                // timerCounterBloc = sl<TimerCounterBloc>(param1: state.timer);
-                /// Using BlocProvider.value instead of BlocProvider because
-                /// I need to update the `TimerCounterBloc` depending the `state.timer`
-                /// so when this rebuilt, it will create a new `TimerCounterBloc` with the updated `state.timer`
-                return BlocProvider<TimerCounterBloc>.value(
-                  value: context.read<TimerCounterBloc>(),
-                  child: const Home(),
-                );
-                // return BlocProvider<TimerCounterBloc>.value(
-                //   // create: (c) => sl<TimerCounterBloc>(param1: state.timer),
-                //   value: sl<TimerCounterBloc>(param1: state.timer),
-                //   child: const CounterWidget(),
-                // );
+                return const Home();
               } else if (state is TimerFailed) {
                 // Failure
                 return const Text('0');
               } else {
-                // Loading
                 return const CircularProgressIndicator();
               }
             },

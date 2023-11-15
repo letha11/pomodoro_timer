@@ -11,8 +11,14 @@ class TimerGet extends TimerEvent {}
 
 class TimerSet extends TimerEvent {
   final int? pomodoroTime;
-  final int? breakTime;
+  final int? shortBreak;
   final int? longBreak;
 
-  const TimerSet({this.pomodoroTime, this.breakTime, this.longBreak});
+  const TimerSet({this.pomodoroTime, this.shortBreak, this.longBreak});
+}
+
+class _TimerChanged extends TimerEvent {
+  final TimerSettingEntity timer;
+
+  const _TimerChanged({required this.timer});
 }

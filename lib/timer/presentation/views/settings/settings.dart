@@ -12,7 +12,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final List<String> _tabs = ['Timer', 'Sounds', 'Something'];
+  final List<String> _tabs = ['Timer', 'Sounds'];
   double heightContainer = 500;
 
   @override
@@ -20,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SafeArea(
       child: DefaultTabController(
         initialIndex: 0,
-        length: 3,
+        length: _tabs.length,
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
@@ -69,7 +69,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           TimerSettings(),
                           const SoundsSetting(),
-                          const Placeholder(),
                         ],
                       ),
                     ),

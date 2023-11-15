@@ -1,21 +1,20 @@
 import 'package:equatable/equatable.dart';
 
+import 'sound_setting_entity.dart';
+import 'timer_setting_entity.dart';
+
 class SettingEntity extends Equatable {
-  final bool pomodoroSequence;
-  final bool playSound;
+  final TimerSettingEntity timerSetting;
+  final SoundSettingEntity soundSetting;
 
-  const SettingEntity({required this.pomodoroSequence, required this.playSound});
+  const SettingEntity({
+    required this.timerSetting,
+    required this.soundSetting,
+  });
 
   @override
-  List<Object> get props => [pomodoroSequence, playSound];
-
-  @override
-  String toString() {
-    return '''
-      TimerEntity: {
-        pomdoroSequence: $pomodoroSequence,
-        playSound: $playSound
-      }
-    ''';
-  }
+  List<Object> get props => [
+        timerSetting,
+        soundSetting,
+      ];
 }

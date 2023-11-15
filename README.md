@@ -1,16 +1,12 @@
 # pomodoro_timer
+You should not making simple things complex like this project.
+The purpose of this project are just me trying to learn Clean Architecture.
 
-A new Flutter project.
+**Will i use Clean Architecture for this kind of simple project again ?**
+No.
 
-## Getting Started
+This project uses Clean Architecture, why ? because i want to learn about the Clean Architecture, i know that it is not necessary to use the Clean Architecture in this kind of project.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The purpose of this project are to learn:
+1. Clean Architecture
+2. Testing in flutter

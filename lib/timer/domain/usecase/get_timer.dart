@@ -1,15 +1,15 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../core/exceptions/failures.dart';
-import '../entity/timer_entity.dart';
-import '../repository/timer_repository.dart';
+import '../entity/timer_setting_entity.dart';
+import '../repository/reactive_setting_repository.dart';
 
 class GetTimerUsecase {
-  final TimerRepository _repository;
+  final ReactiveSettingRepository _repository;
 
   GetTimerUsecase(this._repository);
 
-  Future<Either<Failure, TimerEntity>> call() async {
-    return _repository.getTimer();
+  Either<Failure, Stream<TimerSettingEntity>> call() {
+    return _repository.getTimerStream();
   }
 }

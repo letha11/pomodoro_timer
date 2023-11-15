@@ -5,13 +5,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:clock/clock.dart';
 
-import '../../../../core/utils/audio_player.dart';
-import '../../../../core/utils/countdown.dart';
-import '../../../../core/utils/time_converter.dart';
-import '../../../domain/entity/timer_entity.dart';
-import '../../../../core/utils/error_object.dart';
-import '../../../../core/utils/logger.dart';
-import '../../../domain/usecase/get_storage_timer.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
+import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
+import 'package:pomodoro_timer/core/utils/audio_player.dart';
+import 'package:pomodoro_timer/core/utils/countdown.dart';
+import 'package:pomodoro_timer/core/utils/time_converter.dart';
+import 'package:pomodoro_timer/core/utils/error_object.dart';
+import 'package:pomodoro_timer/core/utils/logger.dart';
 
 part 'timer_counter_event.dart';
 
@@ -40,19 +40,19 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final ILogger? _logger;
   final AudioPlayerL _audioPlayer;
   final TimeConverter timeConverter;
-  final GetStorageTimerUsecase _getStorageTimerUsecase;
-  late TimerEntity timer;
+  final GetTimerUsecase _getTimerUsecase;
+  late TimerSettingEntity timer;
   TimerType type = TimerType.pomodoro;
 
   StreamSubscription<int>? _countdownSubscription;
   int _duration = 0;
   int _timeStamps = clock.now().millisecondsSinceEpoch;
-  late final StreamSubscription<TimerEntity> _timerSubscription;
+  late final StreamSubscription<TimerSettingEntity> _timerSubscription;
 
   TimerCounterBloc({
     required Countdown countdown,
     required this.timeConverter,
-    required GetStorageTimerUsecase getStorageTimerUsecase,
+    required GetTimerUsecase getTimerUsecase,
     required AudioPlayerL audioPlayer,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
@@ -60,7 +60,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         _countdownSubscription = streamSubscription,
         _audioPlayer = audioPlayer,
         _logger = logger,
-        _getStorageTimerUsecase = getStorageTimerUsecase,
+        _getTimerUsecase = getTimerUsecase,
         super(const TimerCounterInitial('00:00', 0)) {
     _subscribeTimer();
 
@@ -81,20 +81,31 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   }
 
   void _subscribeTimer() {
-    _timerSubscription = _getStorageTimerUsecase().listen((data) {
-      // cancel countdown subscription
-      _countdownSubscription?.cancel();
+    final result = _getTimerUsecase();
 
-      timer = data;
+    result.fold(
+      (err) => emit(
+        TimerCounterFailure(
+          ErrorObject.mapFailureToError(err),
+        ),
+      ),
+      (stream) {
+        _timerSubscription = stream.listen((data) {
+          _countdownSubscription?.cancel();
 
-      // will change _duration value
-      _setDurationByType();
+          timer = data;
 
-      // ignore: invalid_use_of_visible_for_testing_member
-      emit(
-        TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps),
-      );
-    });
+          // will change _duration value
+          _setDurationByType();
+
+          // ignore: invalid_use_of_visible_for_testing_member
+          emit(
+            TimerCounterInitial(
+                timeConverter.fromSeconds(_duration), _timeStamps),
+          );
+        });
+      },
+    );
   }
 
   void _onTimerStarted(
@@ -108,7 +119,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
       _audioPlayer.stopSound();
 
       // if(Setting.pomodoroSequence) {.. do something else}?
-    
+
       await _countdown.count(_duration - 1).fold(
         (err) {
           _logger?.log(Level.warning, "[count] {duration: $_duration}");
@@ -169,7 +180,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     if (state is! TimerCounterInitial) {
       _countdownSubscription?.cancel();
 
-      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps));
+      emit(TimerCounterInitial(
+          timeConverter.fromSeconds(_duration), _timeStamps));
     }
   }
 
@@ -179,15 +191,14 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         "TimerCounterChange event get sent, [type: ${event.type}, currentType: $type]");
 
     if (type != event.type) {
-      
       _timeStamps = clock.now().millisecondsSinceEpoch; // reassign
-      
+
       _countdownSubscription?.cancel();
 
       _setDurationByType(event.type);
 
-
-      emit(TimerCounterInitial(timeConverter.fromSeconds(_duration), _timeStamps));
+      emit(TimerCounterInitial(
+          timeConverter.fromSeconds(_duration), _timeStamps));
     }
   }
 
@@ -205,7 +216,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         _duration = timer.pomodoroTime;
         break;
       case TimerType.breakTime:
-        _duration = timer.breakTime;
+        _duration = timer.shortBreak;
         break;
       case TimerType.longBreak:
         _duration = timer.longBreak;

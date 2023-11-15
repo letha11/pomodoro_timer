@@ -1,59 +1,60 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
+import 'package:pomodoro_timer/timer/domain/repository/reactive_setting_repository.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/usecases.dart';
-import 'package:pomodoro_timer/timer/domain/repository/timer_repository.dart';
 
 /// Null safety
-@GenerateNiceMocks([MockSpec<TimerRepository>()])
+@GenerateNiceMocks([MockSpec<ReactiveSettingRepository>()])
 import 'timer_usecase_test.mocks.dart';
 
 void main() {
-  late TimerRepository timerRepository;
-  const timerEntityPopulated = TimerEntity(pomodoroTime: 1, breakTime: 500, longBreak: 900);
+  late ReactiveSettingRepository settingRepository;
 
   setUp(() {
-    timerRepository = MockTimerRepository();
+    settingRepository = MockReactiveSettingRepository();
   });
 
   group('GetTimerUsecase', () {
     late GetTimerUsecase usecase;
+    late StreamController<TimerSettingEntity> timerStream;
 
     setUp(() {
-      timerRepository = MockTimerRepository();
-      usecase = GetTimerUsecase(timerRepository);
+      settingRepository = MockReactiveSettingRepository();
+      usecase = GetTimerUsecase(settingRepository);
+      timerStream = StreamController<TimerSettingEntity>();
     });
 
-    test('should get Right(TimerEntity) from repository', () async {
-      // arrange
-      when(timerRepository.getTimer()).thenAnswer((_) async => const Right(timerEntityPopulated));
+    test('should get Right(Stream<TimerSettingEntity>) from repository',
+        () async {
+      when(settingRepository.getTimerStream())
+          .thenReturn(Right(timerStream.stream));
 
-      // act
-      final response = await usecase();
+      final stream = usecase();
 
-      // assert
-      verify(timerRepository.getTimer()).called(1);
-      // to make sure that no interaction is left for timerRepository.
-      verifyNoMoreInteractions(timerRepository);
-      expect(response, const Right(timerEntityPopulated));
+      verify(settingRepository.getTimerStream()).called(1);
+      verifyNoMoreInteractions(settingRepository);
+      expect(stream.isRight(), true);
+      expect(stream, equals(Right(timerStream.stream)));
     });
 
-    test('should get Left(DBFailure) from repository when something went wrong', () async {
-      // arrange
-      when(timerRepository.getTimer()).thenAnswer((_) async => Left(DBFailure()));
+    test(
+        'should return Left from repository when something unexpected went wrong',
+        () {
+      when(settingRepository.getTimerStream())
+          .thenReturn(Left(UnhandledFailure()));
 
-      // act
-      final response = await usecase();
+      final result = usecase();
 
-      // assert
-      verify(timerRepository.getTimer()).called(1);
-      // to make sure that no interaction is left for timerRepository.
-      verifyNoMoreInteractions(timerRepository);
-      expect(response, Left(DBFailure()));
+      verify(settingRepository.getTimerStream()).called(1);
+      verifyNoMoreInteractions(settingRepository);
+      expect(result.isLeft(), true);
     });
   });
 
@@ -61,40 +62,44 @@ void main() {
     late SetTimerUsecase usecase;
 
     setUp(() {
-      timerRepository = MockTimerRepository();
-      usecase = SetTimerUsecase(timerRepository);
+      settingRepository = MockReactiveSettingRepository();
+      usecase = SetTimerUsecase(settingRepository);
     });
 
     test('should return Right(Success) from repository', () async {
-      // arrange
-      when(timerRepository.setTimer(pomodoroTime: anyNamed('pomodoroTime'), breakTime: anyNamed('breakTime')))
+      when(settingRepository.storeTimerSetting(
+              pomodoroTime: anyNamed('pomodoroTime'),
+              shortBreak: anyNamed('shortBreak'),
+              longBreak: anyNamed('longBreak')))
           .thenAnswer((realInvocation) async => Right(Success()));
 
-      // act
-      final response = await usecase(pomodoroTime: 1500, breakTime: 2000);
+      final response = await usecase();
 
-      // assert
-      verify(timerRepository.setTimer(pomodoroTime: anyNamed('pomodoroTime'), breakTime: anyNamed('breakTime')))
+      verify(settingRepository.storeTimerSetting(
+              pomodoroTime: anyNamed('pomodoroTime'),
+              shortBreak: anyNamed('shortBreak'),
+              longBreak: anyNamed('longBreak')))
           .called(1);
-      // to make sure that no interaction is left for timerRepository.
-      verifyNoMoreInteractions(timerRepository);
-      expect(response, Right(Success()));
+      expect(response.isRight(), true);
+      expect(response, equals(Right(Success())));
     });
-
-    test('should get Left(DBFailure) from repository when something went wrong', () async {
-      // arrange
-      when(timerRepository.setTimer(pomodoroTime: anyNamed('pomodoroTime'), breakTime: anyNamed('breakTime')))
-          .thenAnswer((realInvocation) async => Left(DBFailure()));
-
-      // act
-      final response = await usecase(pomodoroTime: 1500, breakTime: 2000);
-
-      // assert
-      verify(timerRepository.setTimer(pomodoroTime: anyNamed('pomodoroTime'), breakTime: anyNamed('breakTime')))
+    
+    test('should return Left from repository when something unexpected happend', () async {
+      when(settingRepository.storeTimerSetting(
+              pomodoroTime: anyNamed('pomodoroTime'),
+              shortBreak: anyNamed('shortBreak'),
+              longBreak: anyNamed('longBreak')))
+          .thenAnswer((realInvocation) async => Left(UnhandledFailure()));
+      
+      final response = await usecase();
+      
+      verify(settingRepository.storeTimerSetting(
+              pomodoroTime: anyNamed('pomodoroTime'),
+              shortBreak: anyNamed('shortBreak'),
+              longBreak: anyNamed('longBreak')))
           .called(1);
-      // to make sure that no interaction is left for timerRepository.
-      verifyNoMoreInteractions(timerRepository);
-      expect(response, Left(DBFailure()));
+      expect(response.isLeft(), true);
+      expect(response, equals(Left(UnhandledFailure())));
     });
   });
 }

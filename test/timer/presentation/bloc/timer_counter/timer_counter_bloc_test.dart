@@ -14,57 +14,65 @@ import 'package:pomodoro_timer/core/utils/audio_player.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/time_converter.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
-import 'package:pomodoro_timer/timer/domain/usecase/get_storage_timer.dart';
+import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
+import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 
 @GenerateNiceMocks([
   MockSpec<Countdown>(),
   MockSpec<StreamSubscription<int>>(),
   MockSpec<TimeConverter>(),
-  MockSpec<GetStorageTimerUsecase>(),
+  MockSpec<GetTimerUsecase>(),
   MockSpec<AudioPlayer>()
 ])
 import 'timer_counter_bloc_test.mocks.dart';
 
 void main() {
   const duration = 5;
-  const timer = TimerEntity(pomodoroTime: duration, breakTime: 3, longBreak: 5);
+  const timer = TimerSettingEntity(
+    pomodoroTime: duration,
+    shortBreak: 3,
+    longBreak: 5,
+    pomodoroSequence: false,
+  );
 
   late Countdown countdown;
   late TimerCounterBloc bloc;
   late StreamSubscription<int>? subscription;
-  late StreamController<TimerEntity> timerEntityController;
+  late StreamController<TimerSettingEntity> timerStreamController;
   late TimeConverter timeConverter;
-  late GetStorageTimerUsecase getStorageTimerUsecase;
+  late GetTimerUsecase getTimerUsecase;
   late int timeStamps;
   late AudioPlayerL audioPlayer;
 
   setUp(() {
     countdown = MockCountdown();
     subscription = MockStreamSubscription();
-    timerEntityController = StreamController<TimerEntity>();
+    timerStreamController = StreamController<TimerSettingEntity>();
     timeConverter = MockTimeConverter();
-    getStorageTimerUsecase = MockGetStorageTimerUsecase();
-    timeStamps = Clock.fixed(DateTime(2022,09,01)).now().millisecondsSinceEpoch;
+    getTimerUsecase = MockGetTimerUsecase();
+    timeStamps =
+        Clock.fixed(DateTime(2022, 09, 01)).now().millisecondsSinceEpoch;
     audioPlayer = AudioPlayerLImpl(player: MockAudioPlayer());
 
     when(timeConverter.fromSeconds(timer.pomodoroTime)).thenReturn('00:05');
-    when(timeConverter.fromSeconds(timer.breakTime)).thenReturn("00:03");
-    when(getStorageTimerUsecase())
-        .thenAnswer((_) => timerEntityController.stream);
+    when(timeConverter.fromSeconds(timer.shortBreak)).thenReturn("00:03");
+    when(getTimerUsecase.call())
+        .thenReturn(Right(timerStreamController.stream));
+    // when(getTimerUsecase())
+    //     .thenAnswer((_) => timerStreamController.stream);
 
     bloc = withClock(
-        Clock.fixed(DateTime(2022,09,01)),
+        Clock.fixed(DateTime(2022, 09, 01)),
         () => TimerCounterBloc(
-              getStorageTimerUsecase: getStorageTimerUsecase,
+              getTimerUsecase: getTimerUsecase,
               countdown: countdown,
               streamSubscription: subscription,
               audioPlayer: audioPlayer,
               timeConverter: timeConverter,
             ));
 
-    timerEntityController.add(timer);
+    timerStreamController.add(timer);
   });
 
   // _emulateTimerStarted({Function()? callback}) async {
@@ -323,13 +331,14 @@ void main() {
 
   group('TimerCounterTypeChange', () {
     setUp(() {
-      final timer = TimerEntity(
+      final timer = TimerSettingEntity(
         pomodoroTime: 3,
-        breakTime: 2,
+        shortBreak: 2,
         longBreak: 4,
+        pomodoroSequence: false,
       );
 
-      timerEntityController.add(timer);
+      timerStreamController.add(timer);
       when(timeConverter.fromSeconds(3)).thenReturn("00:03");
       when(timeConverter.fromSeconds(2)).thenReturn("00:02");
       when(timeConverter.fromSeconds(4)).thenReturn("00:04");
@@ -340,8 +349,8 @@ void main() {
       () => blocTest<TimerCounterBloc, TimerCounterState>(
         'should emit TimerCounterInitial with pomodoroTime value when type is TimerType.pomodoro',
         build: () => bloc..type = TimerType.breakTime,
-        seed: () => TimerCounterInProgress(
-            "00:02"), // needed this if not seeded the bloc will not emit anything
+        seed: () => TimerCounterInProgress("00:02"),
+        // needed this if not seeded the bloc will not emit anything
         act: (b) => b.add(TimerCounterTypeChange(TimerType.pomodoro)),
         expect: () =>
             <TimerCounterState>[TimerCounterInitial("00:03", timeStamps)],
@@ -352,8 +361,8 @@ void main() {
       'should emit TimerCounterInitial with breakTime value when type is TimerType.breakTime',
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.breakTime)),
-      seed: () => TimerCounterInProgress(
-          "00:02"), // needed because from the concept i didn't use equatable in TimerCounterInitial
+      seed: () => TimerCounterInProgress("00:02"),
+      // needed because from the concept i didn't use equatable in TimerCounterInitial
       // expect: () => [],
       expect: () =>
           <TimerCounterState>[TimerCounterInitial("00:02", timeStamps)],
@@ -363,8 +372,8 @@ void main() {
       'should emit TimerCounterInitial with longBreak value when type is TimerType.longBreak',
       build: () => bloc,
       act: (b) => b.add(TimerCounterTypeChange(TimerType.longBreak)),
-      seed: () => TimerCounterInProgress(
-          "00:02"), // needed because from the concept i didn't use equatable in TimerCounterInitial
+      seed: () => TimerCounterInProgress("00:02"),
+      // needed because from the concept i didn't use equatable in TimerCounterInitial
       expect: () =>
           <TimerCounterState>[TimerCounterInitial("00:04", timeStamps)],
     );

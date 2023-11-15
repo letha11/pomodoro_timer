@@ -1,11 +1,9 @@
 import 'package:get_it/get_it.dart';
+import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
 
-import '../../timer/domain/repository/timer_storage_repository.dart';
-import '../../timer/data/datasource/local/timer_repository_db.dart';
-import '../../timer/data/repository/timer_repository_impl.dart';
-import '../../timer/domain/repository/timer_repository.dart';
+import '../../timer/data/repository/reactive_setting_repository_impl.dart';
+import '../../timer/domain/repository/reactive_setting_repository.dart';
 import '../../timer/domain/usecase/usecases.dart';
-import '../../timer/data/repository/timer_storage_repository_impl.dart';
 import '../../timer/presentation/blocs/timer/timer_bloc.dart';
 import '../../timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'audio_player.dart';
@@ -23,26 +21,25 @@ void init() {
   sl.registerLazySingleton<AudioPlayerL>(() => AudioPlayerLImpl());
   sl.registerLazySingleton<ILogger>(() => LoggerImpl());
 
-  // Repository
-  // when we are overriding <T> with an <abstract class>
-  // we can use an class that implements that `abstract` class
-  // and when some classes need `TimerRepositoryDB` for example
-  // because i register the `TimerRepositoryDB` with an `TimerRepositoryHiveDB`
-  // everytime i call sl() inside of parameter that accept `TimerRepositoryDB` it will always return `TimerRepositoryHiveDB`
-  sl.registerSingletonAsync<TimerRepositoryDB>(
-    () async => await TimerRepositoryHiveDB.create(logger: sl()),
+  sl.registerSingletonAsync<SettingRepositoryDB>(
+    () async => await SettingRepositoryHiveDB.create(logger: sl()),
+    // () async {
+    //   final settingRepositoryHiveDB = await SettingRepositoryHiveDB.create(logger: sl());
+    //   return settingRepositoryHiveDB;
+    // },
   );
-  sl.registerLazySingleton<TimerRepository>(
-    () => TimerRepositoryImpl(timerRepositoryDB: sl(), logger: sl()),
-  );
-  sl.registerLazySingleton<TimerStorageRepository>(
-      () => TimerStorageRepositoryImpl());
+  sl.registerLazySingleton<ReactiveSettingRepository>(
+      () => ReactiveSettingRepositoryImpl(
+            dbRepository: sl(),
+            logger: sl(),
+          ));
+  // sl.registerLazySingleton<TimerRepository>(
+  //   () => TimerRepositoryImpl(timerRepositoryDB: sl(), logger: sl()),
+  // );
 
   // Usecase
   sl.registerLazySingleton(() => GetTimerUsecase(sl()));
   sl.registerLazySingleton(() => SetTimerUsecase(sl()));
-  sl.registerLazySingleton(() => GetStorageTimerUsecase(sl()));
-  sl.registerLazySingleton(() => AddStorageTimerUsecase(sl()));
 
   // Blocs
   sl.registerFactory(
@@ -51,7 +48,6 @@ void init() {
       getTimerUsecase: sl(),
       setTimerUsecase: sl(),
       // timeConverter: sl(),
-      addStorageTimerUsecase: sl(),
     ),
   );
   sl.registerFactory<TimerCounterBloc>(
@@ -59,7 +55,7 @@ void init() {
       countdown: sl(),
       timeConverter: sl(),
       logger: sl(),
-      getStorageTimerUsecase: sl(),
+      getTimerUsecase: sl(),
       audioPlayer: sl(),
     ),
   );

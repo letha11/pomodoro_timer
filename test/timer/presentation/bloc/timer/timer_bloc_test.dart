@@ -1,17 +1,18 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
-import 'package:pomodoro_timer/timer/domain/entity/timer_entity.dart';
-import 'package:pomodoro_timer/timer/domain/usecase/add_storage_timer.dart';
-
+import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/set_timer.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
@@ -19,33 +20,43 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer/timer_bloc.dart';
 @GenerateNiceMocks([
   MockSpec<GetTimerUsecase>(),
   MockSpec<SetTimerUsecase>(),
-  MockSpec<AddStorageTimerUsecase>()
 ])
 import './timer_bloc_test.mocks.dart';
 
 class MockLoggerImpl extends Mock implements LoggerImpl {}
 
 void main() {
-  const TimerEntity timer = TimerEntity(
+  const timerSettingEntity = TimerSettingEntity(
     pomodoroTime: 10,
-    breakTime: 5,
+    shortBreak: 5,
     longBreak: 7,
+    pomodoroSequence: true,
   );
-  
+
+  const timerSettingEntitySet = TimerSettingEntity(
+    pomodoroTime: 100,
+    longBreak: 300,
+    shortBreak: 150,
+    pomodoroSequence: false,
+  );
+
   late GetTimerUsecase getTimerUsecase;
   late SetTimerUsecase setTimerUsecase;
-  late AddStorageTimerUsecase addStorageTimerUsecase;
+  late StreamController<TimerSettingEntity> timerStreamController;
   late TimerBloc bloc;
 
   setUp(() {
     getTimerUsecase = MockGetTimerUsecase();
     setTimerUsecase = MockSetTimerUsecase();
-    addStorageTimerUsecase = MockAddStorageTimerUsecase();
+    timerStreamController = StreamController<TimerSettingEntity>();
     bloc = TimerBloc(
       getTimerUsecase: getTimerUsecase,
       setTimerUsecase: setTimerUsecase,
-      addStorageTimerUsecase: addStorageTimerUsecase,
     );
+  });
+
+  test('bloc state should be TimerInitial by default', () {
+    expect(bloc.state, equals(TimerInitial()));
   });
 
   group('TimerGet', () {
@@ -55,30 +66,29 @@ void main() {
       act: (b) => b.add(TimerGet()),
       setUp: () {
         when(getTimerUsecase.call())
-            .thenAnswer((_) async => const Right(timer));
-        // when(addStorageTimerUsecase(timer))
-        //     .thenAnswer((_) async => null));
+            .thenReturn(Right(timerStreamController.stream));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
-        verify(addStorageTimerUsecase(timer)).called(1);
       },
     );
 
     blocTest<TimerBloc, TimerState>(
       'should emit TimerLoading and TimerLoaded when finished fetching data from local database',
       build: () => bloc,
-      act: (b) => b.add(TimerGet()),
+      act: (b) {
+        b.add(TimerGet());
+        timerStreamController.add(timerSettingEntity);
+      },
       setUp: () {
-        when(getTimerUsecase())
-            .thenAnswer((realInvocation) async => const Right(timer));
+        when(getTimerUsecase()).thenReturn(Right(timerStreamController.stream));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
       },
       expect: () => <TimerState>[
         TimerLoading(),
-        TimerLoaded(timer: timer),
+        TimerLoaded(timer: timerSettingEntity),
       ],
     );
 
@@ -87,12 +97,13 @@ void main() {
       build: () => bloc,
       act: (b) => b.add(TimerGet()),
       setUp: () {
-        when(getTimerUsecase())
-            .thenAnswer((realInvocation) async => Left(UnhandledFailure()));
+        when(getTimerUsecase()).thenReturn(Left(UnhandledFailure()));
       },
       verify: (_) {
         verify(getTimerUsecase()).called(1);
       },
+      wait: Duration.zero,
+      // force your bloc to wait one frame before closing the bloc https://github.com/felangel/bloc/issues/1299
       expect: () => <TimerState>[
         TimerLoading(),
         TimerFailed(error: ErrorObject.mapFailureToError(UnhandledFailure())),
@@ -102,38 +113,39 @@ void main() {
 
   group('TimerSet', () {
     blocTest<TimerBloc, TimerState>(
-      'should only call setTimerUsecase()/setTimerUsecase.call() once',
+      'should call `setTimerUsecase` when TimerSet event added',
       build: () => bloc,
-      setUp: () => when(setTimerUsecase())
-          .thenAnswer((realInvocation) async => Right(Success())),
-      act: (b) => b.add(const TimerSet()),
-      seed: () => TimerLoaded(timer: timer),
-      verify: (_) {
-        verify(setTimerUsecase()).called(1);
-        verify(addStorageTimerUsecase(timer)).called(1);
+      setUp: () {
+        when(setTimerUsecase.call())
+            .thenAnswer((_) async => Right(Success()));
       },
+      act: (b) => b.add(TimerSet()),
+      seed: () => TimerLoaded(timer: timerSettingEntity),
+      verify: (bloc) => verify(setTimerUsecase.call()).called(1),
     );
 
     blocTest<TimerBloc, TimerState>(
-      'should emit TimerLoaded on Success',
+      'should emit TimerLoaded again after an successful TimerGet',
       build: () => bloc,
-      setUp: () => when(
-        setTimerUsecase(
-          pomodoroTime: anyNamed('pomodoroTime'),
-          breakTime: anyNamed('breakTime'),
-          longBreak: anyNamed('longBreak'),
-        ),
-      ).thenAnswer((realInvocation) async => Right(Success())),
-      act: (b) => b.add(TimerSet(pomodoroTime: 5, breakTime: 3, longBreak: 4)),
-      seed: () => TimerLoaded(timer: timer),
+      setUp: () {
+        when(getTimerUsecase()).thenReturn(Right(timerStreamController.stream));
+      },
+      act: (b) {
+        b.add(TimerGet());
+        timerStreamController.add(timerSettingEntity);
+        Future.delayed(Duration(seconds: 2));
+        b.add(TimerSet(pomodoroTime: 100, longBreak: 300, shortBreak: 150));
+        timerStreamController.add(timerSettingEntitySet);
+      },
+      seed: () => TimerLoaded(timer: timerSettingEntity),
+      verify: (_) {
+        verify(getTimerUsecase()).called(1);
+      },
+      wait: Duration.zero,
       expect: () => <TimerState>[
-        TimerLoaded(
-          timer: TimerEntity(
-            pomodoroTime: 5,
-            breakTime: 3,
-            longBreak: 4,
-          ),
-        )
+        TimerLoading(),
+        TimerLoaded(timer: timerSettingEntity),
+        TimerLoaded(timer: timerSettingEntitySet)
       ],
     );
 
@@ -141,14 +153,12 @@ void main() {
       'should emit previous TimerLoaded state with an `error` field filled when error ocured while set data to local database',
       build: () => bloc,
       act: (b) => b.add(TimerSet()),
-      setUp: () => when(setTimerUsecase())
+      setUp: () => when(setTimerUsecase.call())
           .thenAnswer((realInvocation) async => Left(UnhandledFailure())),
-      seed: () => TimerLoaded(
-        timer: TimerEntity(pomodoroTime: 5, breakTime: 3, longBreak: 4),
-      ),
+      seed: () => TimerLoaded(timer: timerSettingEntity),
       expect: () => <TimerState>[
         TimerLoaded(
-          timer: TimerEntity(pomodoroTime: 5, breakTime: 3, longBreak: 4),
+          timer: timerSettingEntity,
           error: ErrorObject.mapFailureToError(UnhandledFailure()),
         ),
       ],
