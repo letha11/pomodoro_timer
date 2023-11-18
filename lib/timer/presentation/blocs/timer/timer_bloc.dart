@@ -62,9 +62,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     /// sent an TimerGet event, so the state will be TimerLoaded/TimerFailure.
     if (state is TimerLoaded) {
       final ts = await _setTimerUsecase(
-        pomodoroTime: event.pomodoroTime,
-        shortBreak: event.shortBreak,
-        longBreak: event.longBreak,
+        pomodoroTime:
+            event.pomodoroTime ?? (state as TimerLoaded).timer.pomodoroTime,
+        shortBreak: event.shortBreak ?? (state as TimerLoaded).timer.shortBreak,
+        longBreak: event.longBreak ?? (state as TimerLoaded).timer.longBreak,
+        pomodoroSequence: event.pomodoroSequence ??
+            (state as TimerLoaded).timer.pomodoroSequence,
       );
 
       ts.fold(

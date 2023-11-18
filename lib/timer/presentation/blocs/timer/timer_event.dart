@@ -13,8 +13,14 @@ class TimerSet extends TimerEvent {
   final int? pomodoroTime;
   final int? shortBreak;
   final int? longBreak;
+  final bool? pomodoroSequence;
 
-  const TimerSet({this.pomodoroTime, this.shortBreak, this.longBreak});
+  const TimerSet({
+    this.pomodoroTime,
+    this.shortBreak,
+    this.longBreak,
+    this.pomodoroSequence,
+  });
 }
 
 class _TimerChanged extends TimerEvent {

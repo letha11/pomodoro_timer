@@ -80,19 +80,25 @@ class ReactiveSettingRepositoryImpl extends ReactiveSettingRepository {
   }
 
   @override
-  Future<Either<Failure, Success>> storeTimerSetting(
-      {int? pomodoroTime, int? shortBreak, int? longBreak}) async {
+  Future<Either<Failure, Success>> storeTimerSetting({
+    int? pomodoroTime,
+    int? shortBreak,
+    int? longBreak,
+    bool? pomodoroSequence,
+  }) async {
     try {
       TimerSettingModel newTimerModel = TimerSettingModel(
         pomodoroTime: pomodoroTime,
         shortBreak: shortBreak,
         longBreak: longBreak,
+        pomodoroSequence: pomodoroSequence,
       );
 
       await _dbRepository.storeTimerSetting(
         pomodoroTime: pomodoroTime,
         longBreak: longBreak,
         shortBreak: shortBreak,
+        pomodoroSequence: pomodoroSequence,
       );
 
       _timerController.sink.add(newTimerModel.toEntity());

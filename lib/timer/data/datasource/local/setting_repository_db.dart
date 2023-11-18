@@ -5,9 +5,16 @@ import '../../models/setting_hive_model.dart';
 
 abstract class SettingRepositoryDB {
   TimerSettingModel getTimer();
-  Future<void> storeTimerSetting({int? pomodoroTime, int? shortBreak, int? longBreak});
+
+  Future<void> storeTimerSetting({
+    int? pomodoroTime,
+    int? shortBreak,
+    int? longBreak,
+    bool? pomodoroSequence,
+  });
 
   SoundSettingModel getSound();
+
   Future<void> storeSoundSetting({bool? playSound, String? audioPath});
 }
 
@@ -52,11 +59,17 @@ class SettingRepositoryHiveDB implements SettingRepositoryDB {
   }
 
   @override
-  Future<void> storeTimerSetting({int? pomodoroTime, int? shortBreak, int? longBreak}) async {
+  Future<void> storeTimerSetting({
+    int? pomodoroTime,
+    int? shortBreak,
+    int? longBreak,
+    bool? pomodoroSequence,
+  }) async {
     _logger?.log(Level.info, '''[SettingRepositoryHiveDB(storeTimer)]: {
       pomodoroTime: $pomodoroTime,
       shortBreak: $shortBreak,
       longBreak: $longBreak,
+      pomodoroSequence: $pomodoroSequence,
     }''');
 
     _settingModel = SettingHiveModel(
@@ -64,6 +77,8 @@ class SettingRepositoryHiveDB implements SettingRepositoryDB {
         pomodoroTime: pomodoroTime ?? _settingModel.timerSetting.pomodoroTime,
         longBreak: longBreak ?? _settingModel.timerSetting.longBreak,
         shortBreak: shortBreak ?? _settingModel.timerSetting.shortBreak,
+        pomodoroSequence:
+            pomodoroSequence ?? _settingModel.timerSetting.pomodoroSequence,
       ),
       soundSetting: _settingModel.soundSetting,
     );
@@ -91,7 +106,6 @@ class SettingRepositoryHiveDB implements SettingRepositoryDB {
         audioPath: audioPath ?? _settingModel.soundSetting.audioPath,
       ),
     );
-
 
     await _box.put(0, _settingModel);
   }

@@ -7,10 +7,16 @@ import '../entity/timer_setting_entity.dart';
 
 abstract class ReactiveSettingRepository {
   Either<Failure, Stream<TimerSettingEntity>> getTimerStream();
+
   Either<Failure, Stream<SoundSettingEntity>> getSoundStream();
 
-  Future<Either<Failure, Success>> storeTimerSetting(
-      {int? pomodoroTime, int? shortBreak, int? longBreak});
+  Future<Either<Failure, Success>> storeTimerSetting({
+    int? pomodoroTime,
+    int? shortBreak,
+    int? longBreak,
+    bool? pomodoroSequence,
+  });
+
   Future<Either<Failure, Success>> storeSoundSetting(
       {bool? playSound, String? audioPath});
 }

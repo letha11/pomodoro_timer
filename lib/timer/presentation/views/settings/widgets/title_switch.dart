@@ -7,9 +7,11 @@ class TitleSwitch extends StatefulWidget {
     super.key,
     required this.title,
     required this.onToggle,
+    this.initialState,
   });
 
   final String title;
+  final bool? initialState;
   final void Function(bool) onToggle;
 
   @override
@@ -17,13 +19,19 @@ class TitleSwitch extends StatefulWidget {
 }
 
 class _TitleSwitchState extends State<TitleSwitch> {
-  bool _switch = false;
+  late bool _switch;
 
   _onToggle() {
     setState(() {
       _switch = !_switch;
     });
     widget.onToggle(_switch);
+  }
+
+  @override
+  void initState() {
+    _switch = widget.initialState ?? false;
+    super.initState();
   }
 
   @override

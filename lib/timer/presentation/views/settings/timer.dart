@@ -139,7 +139,8 @@ Widget build(BuildContext context) {
             const SizedBox(height: 16),
             TitleSwitch(
               title: "Pomodoro Sequence",
-              onToggle: (val) => print(val),
+              initialState: (context.read<TimerBloc>().state as TimerLoaded).timer.pomodoroSequence,
+              onToggle: (val) => context.read<TimerBloc>().add(TimerSet(pomodoroSequence: val)),
             ),
           ],
         ),

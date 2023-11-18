@@ -73,6 +73,7 @@ class MockSettingRepositoryHiveDB extends _i1.Mock
     int? pomodoroTime,
     int? shortBreak,
     int? longBreak,
+    bool? pomodoroSequence,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -82,6 +83,7 @@ class MockSettingRepositoryHiveDB extends _i1.Mock
             #pomodoroTime: pomodoroTime,
             #shortBreak: shortBreak,
             #longBreak: longBreak,
+            #pomodoroSequence: pomodoroSequence,
           },
         ),
         returnValue: _i4.Future<void>.value(),

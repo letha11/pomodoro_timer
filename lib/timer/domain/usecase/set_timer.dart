@@ -9,7 +9,17 @@ class SetTimerUsecase {
 
   SetTimerUsecase(this._timerRepository);
 
-  Future<Either<Failure, Success>> call({int? pomodoroTime, int? shortBreak, int? longBreak}) {
-    return _timerRepository.storeTimerSetting(pomodoroTime: pomodoroTime, shortBreak: shortBreak, longBreak: longBreak);
+  Future<Either<Failure, Success>> call({
+    int? pomodoroTime,
+    int? shortBreak,
+    int? longBreak,
+    bool? pomodoroSequence,
+  }) {
+    return _timerRepository.storeTimerSetting(
+      pomodoroTime: pomodoroTime,
+      shortBreak: shortBreak,
+      longBreak: longBreak,
+      pomodoroSequence: pomodoroSequence,
+    );
   }
 }
