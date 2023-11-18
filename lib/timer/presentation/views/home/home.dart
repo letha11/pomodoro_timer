@@ -132,6 +132,7 @@ class _HomeState extends State<Home> {
           child: SvgPicture.asset(
             asset,
             width: 30,
+            height: 30,
           ),
         );
 
