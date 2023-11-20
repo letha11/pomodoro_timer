@@ -162,11 +162,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
             _logger?.log(Level.debug, "Stream Finished");
             await Future.delayed(const Duration(seconds: 1));
 
-            print(soundSetting.playSound);
             if (soundSetting.playSound) {
-              print(soundSetting.audioPath);
-              // _audioPlayer.playSound(soundSetting.audioPath);
-              _audioPlayer.playSound("assets/audio/alarm.wav");
+              _audioPlayer.playSound(soundSetting.audioPath);
             }
 
             if (type == TimerType.pomodoro &&
