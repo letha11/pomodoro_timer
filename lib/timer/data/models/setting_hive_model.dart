@@ -74,7 +74,7 @@ class SoundSettingModel extends Equatable {
     // this.playSound = true,
     // this.audioPath = 'assets/audio/alarm.mp3',
   })  : playSound = playSound ?? true,
-        audioPath = audioPath ?? 'assets/audio/alarm.mp3';
+        audioPath = audioPath ?? 'assets/audio/alarm.wav';
 
   @override
   List<Object?> get props => [
