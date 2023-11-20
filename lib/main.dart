@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
 import 'core/utils/service_locator.dart';
 import 'firebase_options.dart';
 import 'timer/data/models/setting_hive_model.dart';
-import 'timer/presentation/blocs/timer/timer_bloc.dart';
 import 'timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'timer/presentation/views/home/home.dart';
 
@@ -45,7 +45,7 @@ class App extends StatelessWidget {
       return MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => sl<TimerBloc>()..add(TimerGet()),
+            create: (context) => sl<SettingBloc>()..add(SettingGet()),
           ),
           BlocProvider(
             create: (context) => sl<TimerCounterBloc>(),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 import 'dart:async';
 
 import '../../../../core/utils/service_locator.dart';
 import '../../../../core/utils/time_converter.dart';
-import '../../blocs/timer/timer_bloc.dart';
 import '../../widgets/styled_container.dart';
 import 'widgets/title_switch.dart';
 
@@ -27,8 +27,8 @@ class TimerSettings extends StatelessWidget {
   final _longBreakTimeController = TextEditingController(text: '0');
 
   void _setTimer(BuildContext ctx) {
-    ctx.read<TimerBloc>().add(
-          TimerSet(
+    ctx.read<SettingBloc>().add(
+          SettingSet(
             pomodoroTime: sl<TimeConverter>().minuteToSecond(
               int.parse(_pomodoroTimeController.text),
             ),
@@ -104,11 +104,11 @@ class TimerSettings extends StatelessWidget {
   @override
 Widget build(BuildContext context) {
     pomodoroTime = sl<TimeConverter>().secondToMinutes(
-        (context.read<TimerBloc>().state as TimerLoaded).timer.pomodoroTime);
+        (context.read<SettingBloc>().state as SettingLoaded).timer.pomodoroTime);
     breakTime = sl<TimeConverter>().secondToMinutes(
-        (context.read<TimerBloc>().state as TimerLoaded).timer.shortBreak);
+        (context.read<SettingBloc>().state as SettingLoaded).timer.shortBreak);
     longBreakTime = sl<TimeConverter>().secondToMinutes(
-        (context.read<TimerBloc>().state as TimerLoaded).timer.longBreak);
+        (context.read<SettingBloc>().state as SettingLoaded).timer.longBreak);
 
     return SingleChildScrollView(
       child: Padding(
@@ -139,8 +139,8 @@ Widget build(BuildContext context) {
             const SizedBox(height: 16),
             TitleSwitch(
               title: "Pomodoro Sequence",
-              initialState: (context.read<TimerBloc>().state as TimerLoaded).timer.pomodoroSequence,
-              onToggle: (val) => context.read<TimerBloc>().add(TimerSet(pomodoroSequence: val)),
+              initialState: (context.read<SettingBloc>().state as SettingLoaded).timer.pomodoroSequence,
+              onToggle: (val) => context.read<SettingBloc>().add(SettingSet(pomodoroSequence: val)),
             ),
           ],
         ),

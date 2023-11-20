@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
-import '../../../blocs/timer/timer_bloc.dart';
 
 class TimerSetForm extends StatefulWidget {
   const TimerSetForm({super.key});
@@ -37,7 +37,7 @@ class _TimerSetFormState extends State<TimerSetForm> {
                   child: NumberTextFormField(
                     label: 'Pomodoro Time',
                     controller: _pomodoroTimeController
-                      ..text = (context.read<TimerBloc>().state as TimerLoaded)
+                      ..text = (context.read<SettingBloc>().state as SettingLoaded)
                           .timer
                           .pomodoroTime
                           .toString(),
@@ -48,7 +48,7 @@ class _TimerSetFormState extends State<TimerSetForm> {
                   child: NumberTextFormField(
                     label: 'Break Time',
                     controller: _breakTimeController
-                      ..text = (context.read<TimerBloc>().state as TimerLoaded)
+                      ..text = (context.read<SettingBloc>().state as SettingLoaded)
                           .timer
                           .shortBreak
                           .toString(),
@@ -66,8 +66,8 @@ class _TimerSetFormState extends State<TimerSetForm> {
                     const SnackBar(content: Text('Processing Data')),
                   );
 
-                  context.read<TimerBloc>().add(
-                        TimerSet(
+                  context.read<SettingBloc>().add(
+                        SettingSet(
                           pomodoroTime: int.parse(_pomodoroTimeController.text),
                           shortBreak: int.parse(_breakTimeController.text),
                         ),

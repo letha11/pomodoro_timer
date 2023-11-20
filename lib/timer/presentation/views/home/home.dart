@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
-import '../../blocs/timer/timer_bloc.dart';
 import '../../blocs/timer_counter/timer_counter_bloc.dart';
 import '../../widgets/styled_container.dart';
 import '../settings/settings.dart';
@@ -22,16 +22,16 @@ class HomeScreen extends StatelessWidget {
               fit: BoxFit.fill,
             ),
           ),
-          child: BlocConsumer<TimerBloc, TimerState>(
-            bloc: context.read<TimerBloc>(),
+          child: BlocConsumer<SettingBloc, SettingState>(
+            bloc: context.read<SettingBloc>(),
             listener: (context, state) {
-              if (state is TimerFailed) {
+              if (state is SettingFailed) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.error.message!),
                   ),
                 );
-              } else if (state is TimerLoaded && state.error != null) {
+              } else if (state is SettingLoaded && state.error != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.error!.message!),
@@ -40,9 +40,9 @@ class HomeScreen extends StatelessWidget {
               }
             },
             builder: (context, state) {
-              if (state is TimerLoaded) {
+              if (state is SettingLoaded) {
                 return const Home();
-              } else if (state is TimerFailed) {
+              } else if (state is SettingFailed) {
                 // Failure
                 return const Text('0');
               } else {
@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
               context,
               CupertinoPageRoute(
                 builder: (_) => BlocProvider.value(
-                  value: BlocProvider.of<TimerBloc>(context),
+                  value: BlocProvider.of<SettingBloc>(context),
                   child: const SettingsScreen(),
                 ),
               ),

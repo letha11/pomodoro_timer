@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 import 'package:pomodoro_timer/timer/presentation/views/settings/widgets/title_switch.dart';
 
 class SoundsSetting extends StatelessWidget {
@@ -13,7 +15,7 @@ class SoundsSetting extends StatelessWidget {
           children: [
             TitleSwitch(
               title: "Play Sound",
-              onToggle: (val) => print('bruh sound effect #2'),
+              onToggle: (val) => context.read<SettingBloc>().add(SettingSet(playSound: val)), 
             ),
           ],
         ),

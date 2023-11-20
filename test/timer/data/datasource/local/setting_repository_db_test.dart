@@ -105,7 +105,7 @@ void main() {
 
       // assert
       expect(soundSetting.playSound, equals(true));
-      expect(soundSetting.audioPath, equals('assets/audio/alarm.mp3'));
+      expect(soundSetting.audioPath, equals('assets/audio/alarm.wav'));
     });
   });
 
