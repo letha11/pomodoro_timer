@@ -1,4 +1,3 @@
-// import 'package:audioplayers/audioplayers.dart';
 import 'package:just_audio/just_audio.dart';
 
 abstract class AudioPlayerL {
@@ -14,6 +13,7 @@ class AudioPlayerLImpl extends AudioPlayerL {
   @override
   void playSound(String path) async {
     await _player.setAsset(path);
+    _player.setClip(end: const Duration(seconds: 3));
     _player.play();
   }
 

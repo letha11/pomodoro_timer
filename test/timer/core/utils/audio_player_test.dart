@@ -21,12 +21,15 @@ void main() {
     test('playSound', () async {
       const pathString = 'something.mp3';
       when(player.setAsset(pathString)).thenAnswer((realInvocation) async => const Duration(seconds: 1));
+      when(player.setClip(start: anyNamed('start'), end: anyNamed('end'))).thenAnswer((realInvocation) async => const Duration(seconds: 1));
 
       audioPlayer.playSound(pathString);
       await untilCalled(player.play());
       
       verify(player.setAsset(pathString));
-      verify(player.play());
+      verify(player.setClip(end: const Duration(seconds: 3))).called(1);
+      verify(player.play()).called(1);
+  
       verifyNoMoreInteractions(player);
     });
 
