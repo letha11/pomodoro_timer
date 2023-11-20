@@ -1,11 +1,15 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:clock/clock.dart';
+import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
+import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart';
 import 'package:pomodoro_timer/core/utils/audio_player.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
@@ -41,7 +45,9 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final AudioPlayerL _audioPlayer;
   final TimeConverter timeConverter;
   final GetTimerUsecase _getTimerUsecase;
+  final GetSoundSettingUsecase _getSoundSettingUsecase;
   late TimerSettingEntity timer;
+  late SoundSettingEntity soundSetting;
   int _pomodoroCounter = 3;
   TimerType type = TimerType.pomodoro;
 
@@ -49,11 +55,13 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   int _duration = 3;
   int _timeStamps = clock.now().millisecondsSinceEpoch;
   late final StreamSubscription<TimerSettingEntity> _timerSubscription;
+  late final StreamSubscription<SoundSettingEntity> _soundSettingSubscription;
 
   TimerCounterBloc({
     required Countdown countdown,
     required this.timeConverter,
     required GetTimerUsecase getTimerUsecase,
+    required GetSoundSettingUsecase getSoundSettingUsecase,
     required AudioPlayerL audioPlayer,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
@@ -62,8 +70,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
         _audioPlayer = audioPlayer,
         _logger = logger,
         _getTimerUsecase = getTimerUsecase,
+        _getSoundSettingUsecase = getSoundSettingUsecase,
         super(const TimerCounterInitial('00:00', 0)) {
     _subscribeTimer();
+    _subscribeSoundSetting();
 
     on<TimerCounterStarted>(_onTimerStarted);
     on<TimerCounterPaused>(_onTimerPaused);
@@ -78,13 +88,27 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   Future<void> close() {
     _countdownSubscription?.cancel();
     _timerSubscription.cancel();
+    _soundSettingSubscription.cancel();
     return super.close();
+  }
+
+  void _subscribeSoundSetting() {
+    final result = _getSoundSettingUsecase();
+
+    result.fold(
+        (err) => emit(
+              TimerCounterFailure(
+                ErrorObject.mapFailureToError(err),
+              ),
+            ), (stream) {
+      _soundSettingSubscription = stream.listen((data) => soundSetting = data);
+    });
   }
 
   void _subscribeTimer() {
     final result = _getTimerUsecase();
 
-    result.fold(
+    result.fold( 
       (err) => emit(
         TimerCounterFailure(
           ErrorObject.mapFailureToError(err),
@@ -134,13 +158,20 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
                 formattedDuration: timeConverter.fromSeconds(d)));
           }, onDone: () async {
             _pomodoroCounter++;
-            debugPrint(_pomodoroCounter.toString());
-            
+
             _logger?.log(Level.debug, "Stream Finished");
             await Future.delayed(const Duration(seconds: 1));
 
-            _audioPlayer.playSound("assets/audio/alarm.wav");
-            if (type == TimerType.pomodoro && _pomodoroCounter % 4 == 0 && timer.pomodoroSequence) {
+            print(soundSetting.playSound);
+            if (soundSetting.playSound) {
+              print(soundSetting.audioPath);
+              // _audioPlayer.playSound(soundSetting.audioPath);
+              _audioPlayer.playSound("assets/audio/alarm.wav");
+            }
+
+            if (type == TimerType.pomodoro &&
+                _pomodoroCounter % 4 == 0 &&
+                timer.pomodoroSequence) {
               _setDurationByType(TimerType.longBreak);
             } else if (type == TimerType.pomodoro) {
               _setDurationByType(TimerType.breakTime);

@@ -13,8 +13,12 @@ import 'package:mockito/src/dummies.dart' as _i7;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i6;
 import 'package:pomodoro_timer/core/utils/countdown.dart' as _i5;
 import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i8;
+import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart'
+    as _i13;
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart'
     as _i10;
+import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart'
+    as _i12;
 import 'package:pomodoro_timer/timer/domain/usecase/get_timer.dart' as _i9;
 
 // ignore_for_file: type=lint
@@ -905,4 +909,35 @@ class MockAudioPlayer extends _i1.Mock implements _i4.AudioPlayer {
         returnValue: _i3.Future<void>.value(),
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
+}
+
+/// A class which mocks [GetSoundSettingUsecase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetSoundSettingUsecase extends _i1.Mock
+    implements _i12.GetSoundSettingUsecase {
+  @override
+  _i2.Either<_i6.Failure, _i3.Stream<_i13.SoundSettingEntity>> call() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #call,
+          [],
+        ),
+        returnValue:
+            _FakeEither_0<_i6.Failure, _i3.Stream<_i13.SoundSettingEntity>>(
+          this,
+          Invocation.method(
+            #call,
+            [],
+          ),
+        ),
+        returnValueForMissingStub:
+            _FakeEither_0<_i6.Failure, _i3.Stream<_i13.SoundSettingEntity>>(
+          this,
+          Invocation.method(
+            #call,
+            [],
+          ),
+        ),
+      ) as _i2.Either<_i6.Failure, _i3.Stream<_i13.SoundSettingEntity>>);
 }
