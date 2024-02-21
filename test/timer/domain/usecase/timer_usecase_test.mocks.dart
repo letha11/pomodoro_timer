@@ -4,9 +4,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
+import 'dart:typed_data' as _i10;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:pomodoro_timer/core/constants.dart' as _i9;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i4;
 import 'package:pomodoro_timer/core/success.dart' as _i8;
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart'
@@ -144,7 +146,9 @@ class MockReactiveSettingRepository extends _i1.Mock
   @override
   _i5.Future<_i2.Either<_i4.Failure, _i8.Success>> storeSoundSetting({
     bool? playSound,
-    String? audioPath,
+    _i9.SoundType? type,
+    _i10.Uint8List? bytesData,
+    String? importedFileName,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -152,7 +156,9 @@ class MockReactiveSettingRepository extends _i1.Mock
           [],
           {
             #playSound: playSound,
-            #audioPath: audioPath,
+            #type: type,
+            #bytesData: bytesData,
+            #importedFileName: importedFileName,
           },
         ),
         returnValue: _i5.Future<_i2.Either<_i4.Failure, _i8.Success>>.value(
@@ -163,7 +169,9 @@ class MockReactiveSettingRepository extends _i1.Mock
             [],
             {
               #playSound: playSound,
-              #audioPath: audioPath,
+              #type: type,
+              #bytesData: bytesData,
+              #importedFileName: importedFileName,
             },
           ),
         )),
@@ -176,7 +184,9 @@ class MockReactiveSettingRepository extends _i1.Mock
             [],
             {
               #playSound: playSound,
-              #audioPath: audioPath,
+              #type: type,
+              #bytesData: bytesData,
+              #importedFileName: importedFileName,
             },
           ),
         )),

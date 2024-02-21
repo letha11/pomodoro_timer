@@ -1,14 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:clock/clock.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/utils/audio_player.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
@@ -25,8 +26,8 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_coun
   MockSpec<StreamSubscription<int>>(),
   MockSpec<TimeConverter>(),
   MockSpec<GetTimerUsecase>(),
-  MockSpec<AudioPlayer>(),
   MockSpec<GetSoundSettingUsecase>(),
+  MockSpec<AudioPlayerLImpl>(),
 ])
 import 'timer_counter_bloc_test.mocks.dart';
 
@@ -38,7 +39,12 @@ void main() {
     longBreak: 5,
     pomodoroSequence: false,
   );
-  const soundSetting = SoundSettingEntity(playSound: true, audioPath: 'assets/audio/alarm.wav');
+  SoundSettingEntity soundSetting = SoundSettingEntity(
+    playSound: true,
+    defaultAudioPath: 'assets/audio/alarm.wav',
+    type: SoundType.defaults,
+    bytesData: Uint8List(100),
+  );
 
   late Countdown countdown;
   late TimerCounterBloc bloc;
@@ -61,13 +67,14 @@ void main() {
     getSoundSettingUsecase = MockGetSoundSettingUsecase();
     timeStamps =
         Clock.fixed(DateTime(2022, 09, 01)).now().millisecondsSinceEpoch;
-    audioPlayer = AudioPlayerLImpl(player: MockAudioPlayer());
+    audioPlayer = MockAudioPlayerLImpl();
 
     when(timeConverter.fromSeconds(timer.pomodoroTime)).thenReturn('00:05');
     when(timeConverter.fromSeconds(timer.shortBreak)).thenReturn("00:03");
     when(getTimerUsecase.call())
         .thenReturn(Right(timerStreamController.stream));
-    when(getSoundSettingUsecase()).thenReturn(Right(soundSettingController.stream));
+    when(getSoundSettingUsecase())
+        .thenReturn(Right(soundSettingController.stream));
     // when(getTimerUsecase())
     //     .thenAnswer((_) => timerStreamController.stream);
 
@@ -85,7 +92,6 @@ void main() {
     timerStreamController.add(timer);
     soundSettingController.add(soundSetting);
   });
-
 
   tearDown(() {
     bloc.close();
@@ -219,7 +225,7 @@ void main() {
       ],
       verify: (_) {
         verify(audioPlayer.stopSound()).called(1);
-        verify(audioPlayer.playSound(soundSetting.audioPath)).called(1);
+        verify(audioPlayer.playSound(soundSetting.defaultAudioPath)).called(1);
       },
     );
 
@@ -241,12 +247,12 @@ void main() {
       },
       verify: (_) {
         verify(audioPlayer.stopSound()).called(1);
-        verify(audioPlayer.playSound(soundSetting.audioPath)).called(1);
+        verify(audioPlayer.playSound(soundSetting.defaultAudioPath)).called(1);
       },
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
-      'playSound should not be called when playSouns setting set to false',
+      'should called stopSound and playSoundFromUint8List when Stream is finished and playSound setting to true and type is imported',
       build: () => bloc,
       setUp: () async {
         when(countdown.count(duration - 1))
@@ -254,7 +260,13 @@ void main() {
         when(timeConverter.fromSeconds(duration - 1)).thenReturn("00:05");
       },
       act: (b) async {
-        soundSettingController.add(SoundSettingEntity(playSound: false, audioPath: soundSetting.audioPath));
+        soundSettingController.add(SoundSettingEntity(
+          playSound: true,
+          defaultAudioPath: soundSetting.defaultAudioPath,
+          type: SoundType.imported,
+          bytesData: soundSetting.bytesData!,
+        ));
+        // soundSettingController.add(soundSetting);
         b.add(TimerCounterStarted());
         await untilCalled(countdown.count(duration - 1));
 
@@ -263,7 +275,34 @@ void main() {
       },
       verify: (_) {
         verify(audioPlayer.stopSound()).called(1);
-        verifyNever(audioPlayer.playSound(soundSetting.audioPath));
+        verify(audioPlayer.playSoundFromUint8List(soundSetting.bytesData!))
+            .called(1);
+      },
+    );
+
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'playSound should not be called when playSounds setting set to false',
+      build: () => bloc,
+      setUp: () async {
+        when(countdown.count(duration - 1))
+            .thenReturn(Right(timerCounterStartedController.stream));
+        when(timeConverter.fromSeconds(duration - 1)).thenReturn("00:05");
+      },
+      act: (b) async {
+        soundSettingController.add(SoundSettingEntity(
+          playSound: false,
+          defaultAudioPath: soundSetting.defaultAudioPath,
+          type: SoundType.defaults,
+        ));
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(duration - 1));
+
+        await timerCounterStartedController.close();
+        await Future.delayed(const Duration(seconds: 1));
+      },
+      verify: (_) {
+        verify(audioPlayer.stopSound()).called(1);
+        verifyNever(audioPlayer.playSound(soundSetting.defaultAudioPath));
       },
     );
   });

@@ -4,8 +4,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
+import 'dart:typed_data' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:pomodoro_timer/core/constants.dart' as _i5;
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart'
     as _i3;
 import 'package:pomodoro_timer/timer/data/models/setting_hive_model.dart'
@@ -109,6 +111,9 @@ class MockSettingRepositoryHiveDB extends _i1.Mock
   _i4.Future<void> storeSoundSetting({
     bool? playSound,
     String? audioPath,
+    _i5.SoundType? type,
+    _i6.Uint8List? bytesData,
+    String? importedFileName,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -117,6 +122,9 @@ class MockSettingRepositoryHiveDB extends _i1.Mock
           {
             #playSound: playSound,
             #audioPath: audioPath,
+            #type: type,
+            #bytesData: bytesData,
+            #importedFileName: importedFileName,
           },
         ),
         returnValue: _i4.Future<void>.value(),

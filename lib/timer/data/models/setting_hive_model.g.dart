@@ -98,18 +98,27 @@ class SoundSettingModelAdapter extends TypeAdapter<SoundSettingModel> {
     };
     return SoundSettingModel(
       playSound: fields[0] as bool?,
-      audioPath: fields[1] as String?,
+      defaultAudioPath: fields[1] as String?,
+      type: fields[2] as String?,
+      bytesData: fields[3] as Uint8List?,
+      importedFileName: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SoundSettingModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.playSound)
       ..writeByte(1)
-      ..write(obj.audioPath);
+      ..write(obj.defaultAudioPath)
+      ..writeByte(2)
+      ..write(obj.type)
+      ..writeByte(3)
+      ..write(obj.bytesData)
+      ..writeByte(4)
+      ..write(obj.importedFileName);
   }
 
   @override

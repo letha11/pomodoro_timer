@@ -62,7 +62,8 @@ void main() {
     test('should return correct value', () async {
       when(settingRepository.storeSoundSetting(
               playSound: anyNamed('playSound'),
-              audioPath: anyNamed('audioPath')))
+              bytesData: anyNamed('bytesData'),
+              type: anyNamed('type')))
           .thenAnswer((realInvocation) async => Right(Success()));
 
       var result = await usecase();
@@ -72,7 +73,8 @@ void main() {
 
       when(settingRepository.storeSoundSetting(
               playSound: anyNamed('playSound'),
-              audioPath: anyNamed('audioPath')))
+              bytesData: anyNamed('bytesData'),
+              type: anyNamed('type')))
           .thenAnswer((realInvocation) async => Left(UnhandledFailure()));
 
       result = await usecase();
@@ -80,7 +82,11 @@ void main() {
       expect(result.isLeft(), true);
       expect(result, equals(Left(UnhandledFailure())));
 
-      verify(settingRepository.storeSoundSetting(playSound: anyNamed('playSound'),audioPath: anyNamed('audioPath'))).called(2);
+      verify(settingRepository.storeSoundSetting(
+              playSound: anyNamed('playSound'),
+              bytesData: anyNamed('bytesData'),
+              type: anyNamed('type')))
+          .called(2);
       verifyNoMoreInteractions(settingRepository);
     });
   });

@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:dartz/dartz.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 
 import '../../../core/exceptions/failures.dart';
 import '../../../core/success.dart';
@@ -18,5 +21,8 @@ abstract class ReactiveSettingRepository {
   });
 
   Future<Either<Failure, Success>> storeSoundSetting(
-      {bool? playSound, String? audioPath});
+      {bool? playSound,
+      SoundType? type,
+      Uint8List? bytesData,
+      String? importedFileName});
 }

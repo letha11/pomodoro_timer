@@ -15,7 +15,9 @@ class SettingSet extends SettingEvent {
   final int? longBreak;
   final bool? pomodoroSequence;
   final bool? playSound;
-  final String? audioPath;
+  final Uint8List? bytesData;
+  final SoundType? type;
+  final String? importedFileName;
 
   const SettingSet({
     this.pomodoroTime,
@@ -23,7 +25,9 @@ class SettingSet extends SettingEvent {
     this.longBreak,
     this.pomodoroSequence,
     this.playSound,
-    this.audioPath,
+    this.bytesData,
+    this.type,
+    this.importedFileName,
   });
 }
 

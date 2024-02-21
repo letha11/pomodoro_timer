@@ -7,6 +7,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
@@ -41,8 +42,9 @@ void main() {
     pomodoroSequence: false,
   );
   const soundSettingEntitySet = SoundSettingEntity(
-    audioPath: 'assets/audio/somethingelse.wav',
+    defaultAudioPath: 'assets/audio/somethingelse.wav',
     playSound: false,
+    type: SoundType.defaults,
   );
 
   late GetTimerUsecase getTimerUsecase;
@@ -63,8 +65,9 @@ void main() {
       pomodoroSequence: true,
     );
     soundSettingEntity = SoundSettingEntity(
-      audioPath: 'assets/audio/alarm.wav',
+      defaultAudioPath: 'assets/audio/alarm.wav',
       playSound: true,
+      type: SoundType.defaults,
     );
     setSoundSettingUsecase = MockSetSoundSettingUsecase();
     getSoundSettingUsecase = MockGetSoundSettingUsecase();
@@ -241,12 +244,14 @@ void main() {
         // SettingSet event stub
         when(setSoundSettingUsecase(
           playSound: anyNamed('playSound'),
-          audioPath: anyNamed('audioPath'),
+          bytesData: anyNamed('bytesData'),
+          type: anyNamed('type'),
         )).thenAnswer((realInvocation) async => Right(Success()));
       },
       verify: (_) => verify(setSoundSettingUsecase(
         playSound: anyNamed('playSound'),
-        audioPath: anyNamed('audioPath'),
+        bytesData: anyNamed('bytesData'),
+        type: anyNamed('type'),
       )).called(1),
     );
 
@@ -278,7 +283,8 @@ void main() {
         )).thenAnswer((realInvocation) async => Right(Success()));
         when(setSoundSettingUsecase(
           playSound: anyNamed('playSound'),
-          audioPath: anyNamed('audioPath'),
+          bytesData: anyNamed('bytesData'),
+          type: anyNamed('type'),
         )).thenAnswer((realInvocation) async => Right(Success()));
       },
       verify: (_) {
@@ -290,7 +296,8 @@ void main() {
         )).called(1);
         verify(setSoundSettingUsecase(
           playSound: anyNamed('playSound'),
-          audioPath: anyNamed('audioPath'),
+          bytesData: anyNamed('bytesData'),
+          type: anyNamed('type'),
         )).called(1);
       },
     );
@@ -323,7 +330,8 @@ void main() {
         )).thenAnswer((realInvocation) async => Right(Success()));
         when(setSoundSettingUsecase(
           playSound: anyNamed('playSound'),
-          audioPath: anyNamed('audioPath'),
+          bytesData: anyNamed('bytesData'),
+          type: anyNamed('type'),
         )).thenAnswer((realInvocation) async => Right(Success()));
         timerStreamController.add(timerSettingEntitySet);
         soundStreamController.add(soundSettingEntitySet);
@@ -379,7 +387,8 @@ void main() {
         )).thenAnswer((realInvocation) async => Right(Success()));
         when(setSoundSettingUsecase(
           playSound: anyNamed('playSound'),
-          audioPath: anyNamed('audioPath'),
+          bytesData: anyNamed('bytesData'),
+          type: anyNamed('type'),
         )).thenAnswer((realInvocation) async => Left(UnhandledFailure()));
         // timerStreamController.add(timerSettingEntitySet);
         // soundStreamController.add(soundSettingEntitySet);

@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 
 import '../../domain/entity/sound_setting_entity.dart';
 import '../../domain/entity/timer_setting_entity.dart';
@@ -66,21 +69,30 @@ class SoundSettingModel extends Equatable {
   final bool playSound;
 
   @HiveField(1)
-  final String audioPath;
+  final String defaultAudioPath;
+
+  @HiveField(2)
+  final String type;
+
+  @HiveField(3)
+  final Uint8List? bytesData;
+
+  @HiveField(4)
+  final String? importedFileName;
 
   const SoundSettingModel({
     bool? playSound,
-    String? audioPath,
-    // this.playSound = true,
-    // this.audioPath = 'assets/audio/alarm.mp3',
+    String? defaultAudioPath,
+    String? type,
+    this.bytesData,
+    this.importedFileName,
   })  : playSound = playSound ?? true,
-        audioPath = audioPath ?? 'assets/audio/alarm.wav';
+        defaultAudioPath = defaultAudioPath ?? 'assets/audio/alarm.wav',
+        type = type ?? 'default';
 
   @override
-  List<Object?> get props => [
-        playSound,
-        audioPath,
-      ];
+  List<Object?> get props =>
+      [playSound, defaultAudioPath, type, bytesData, importedFileName];
 }
 
 // create an extension method for each above model to convert into an Entity
@@ -99,7 +111,10 @@ extension SoundSettingModelX on SoundSettingModel {
   SoundSettingEntity toEntity() {
     return SoundSettingEntity(
       playSound: playSound,
-      audioPath: audioPath,
+      defaultAudioPath: defaultAudioPath,
+      type: type.toSoundType,
+      bytesData: bytesData,
+      importedFileName: importedFileName,
     );
   }
 }

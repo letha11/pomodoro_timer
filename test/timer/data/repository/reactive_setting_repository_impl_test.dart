@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/success.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
@@ -181,8 +183,8 @@ void main() {
         isA<SoundSettingEntity>()
             .having(
                 (p0) => p0.playSound, 'playSound', soundSettingModel.playSound)
-            .having(
-                (p0) => p0.audioPath, 'audioPath', soundSettingModel.audioPath),
+            .having((p0) => p0.defaultAudioPath, 'audioPath',
+                soundSettingModel.defaultAudioPath),
       );
     });
 
@@ -191,8 +193,9 @@ void main() {
         () async {
       when(dbRepository.getSound()).thenReturn(soundSettingModel);
 
-      const newSoundSetting = SoundSettingModel(
-        audioPath: 'test:)',
+      SoundSettingModel newSoundSetting = SoundSettingModel(
+        bytesData: Uint8List(0),
+        type: SoundType.imported.valueAsString,
         playSound: false,
       );
 
@@ -204,8 +207,9 @@ void main() {
           (result as Right<Failure, Stream<SoundSettingEntity>>).value;
 
       final storeResult = await reactiveSettingRepository.storeSoundSetting(
-        audioPath: newSoundSetting.audioPath,
         playSound: newSoundSetting.playSound,
+        bytesData: newSoundSetting.bytesData,
+        type: newSoundSetting.type.toSoundType,
       );
 
       expect(storeResult.isRight(), true);
@@ -213,8 +217,9 @@ void main() {
       expect((storeResult as Right).value, isA<Success>());
 
       verify(dbRepository.storeSoundSetting(
-        audioPath: newSoundSetting.audioPath,
         playSound: newSoundSetting.playSound,
+        bytesData: newSoundSetting.bytesData,
+        type: newSoundSetting.type.toSoundType,
       )).called(1);
 
       expect(
@@ -231,11 +236,14 @@ void main() {
       when(dbRepository.getSound()).thenReturn(soundSettingModel);
       when(dbRepository.storeSoundSetting(
               audioPath: anyNamed('audioPath'),
+              bytesData: anyNamed('bytesData'),
+              type: anyNamed('type'),
               playSound: anyNamed('playSound')))
           .thenThrow(Exception('X_X'));
 
       final result = await reactiveSettingRepository.storeSoundSetting(
-        audioPath: '',
+        bytesData: Uint8List(0),
+        type: SoundType.imported,
         playSound: false,
       );
 

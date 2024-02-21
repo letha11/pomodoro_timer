@@ -4,9 +4,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
+import 'dart:typed_data' as _i12;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:pomodoro_timer/core/constants.dart' as _i13;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i4;
 import 'package:pomodoro_timer/core/success.dart' as _i8;
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart'
@@ -164,7 +166,9 @@ class MockSetSoundSettingUsecase extends _i1.Mock
   @override
   _i5.Future<_i2.Either<_i4.Failure, _i8.Success>> call({
     bool? playSound,
-    String? audioPath,
+    _i12.Uint8List? bytesData,
+    _i13.SoundType? type,
+    String? importedFileName,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -172,7 +176,9 @@ class MockSetSoundSettingUsecase extends _i1.Mock
           [],
           {
             #playSound: playSound,
-            #audioPath: audioPath,
+            #bytesData: bytesData,
+            #type: type,
+            #importedFileName: importedFileName,
           },
         ),
         returnValue: _i5.Future<_i2.Either<_i4.Failure, _i8.Success>>.value(
@@ -183,7 +189,9 @@ class MockSetSoundSettingUsecase extends _i1.Mock
             [],
             {
               #playSound: playSound,
-              #audioPath: audioPath,
+              #bytesData: bytesData,
+              #type: type,
+              #importedFileName: importedFileName,
             },
           ),
         )),
@@ -196,7 +204,9 @@ class MockSetSoundSettingUsecase extends _i1.Mock
             [],
             {
               #playSound: playSound,
-              #audioPath: audioPath,
+              #bytesData: bytesData,
+              #type: type,
+              #importedFileName: importedFileName,
             },
           ),
         )),

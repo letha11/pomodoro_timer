@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/set_sound_setting.dart';
@@ -111,68 +113,49 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   _onSettingSet(SettingSet event, Emitter<SettingState> emit) async {
     // print(state);
     // if (state is SettingLoaded) {
-      if (event.pomodoroTime != null ||
-          event.pomodoroSequence != null ||
-          event.longBreak != null ||
-          event.shortBreak != null) {
-        final ts = await _setTimerUsecase(
-          pomodoroTime: event.pomodoroTime ?? _timer!.pomodoroTime,
-          shortBreak: event.shortBreak ?? _timer!.shortBreak,
-          longBreak: event.longBreak ?? _timer!.longBreak,
-          pomodoroSequence: event.pomodoroSequence ?? _timer!.pomodoroSequence,
-        );
+    if (event.pomodoroTime != null ||
+        event.pomodoroSequence != null ||
+        event.longBreak != null ||
+        event.shortBreak != null) {
+      final ts = await _setTimerUsecase(
+        pomodoroTime: event.pomodoroTime ?? _timer!.pomodoroTime,
+        shortBreak: event.shortBreak ?? _timer!.shortBreak,
+        longBreak: event.longBreak ?? _timer!.longBreak,
+        pomodoroSequence: event.pomodoroSequence ?? _timer!.pomodoroSequence,
+      );
 
-        ts.fold(
-          (err) {
-            emit((state as SettingLoaded)
-                .copyWith(error: ErrorObject.mapFailureToError(err)));
-          },
-          (data) => null,
-        );
-      }
+      ts.fold(
+        (err) {
+          emit((state as SettingLoaded)
+              .copyWith(error: ErrorObject.mapFailureToError(err)));
+        },
+        (data) => null,
+      );
+    }
 
-      if (event.audioPath != null || event.playSound != null) {
-        final ss = await _setSoundSettingUsecase(
-          audioPath: event.audioPath ?? _soundSetting!.audioPath,
-          playSound: event.playSound ?? _soundSetting!.playSound,
-        );
+    if (event.type != null ||
+        event.playSound != null ||
+        event.bytesData != null ||
+        event.importedFileName != null) {
+      final ss = await _setSoundSettingUsecase(
+        playSound: event.playSound ?? _soundSetting!.playSound,
+        type: event.type ?? _soundSetting!.type,
+        bytesData: event.bytesData ?? _soundSetting!.bytesData,
+        importedFileName:
+            event.importedFileName ?? _soundSetting!.importedFileName,
+      );
 
-        ss.fold(
-          (err) {
-            emit((state as SettingLoaded)
-                .copyWith(error: ErrorObject.mapFailureToError(err)));
-            return;
-          },
-          (data) => null,
-        );
-      }
+      ss.fold(
+        (err) {
+          emit((state as SettingLoaded)
+              .copyWith(error: ErrorObject.mapFailureToError(err)));
+          return;
+        },
+        (data) => null,
+      );
+    }
     // }
   }
-
-  // _onSetTimerSetting(SetTimerSetting event, Emitter<SettingState> emit) async {
-  //   _logger?.log(Level.debug,
-  //       "TimerSet event get registered, [pomodoroTime: ${event.pomodoroTime}, breakTime: ${event.shortBreak}, longBreak: ${event.longBreak}]");
-
-  //   /// because when this bloc get initialized, it will
-  //   /// sent an TimerGet event, so the state will be TimerLoaded/TimerFailure.
-  //   if (state is SettingLoaded) {
-  //     final ts = await _setTimerUsecase(
-  //       pomodoroTime:
-  //           event.pomodoroTime ?? (state as SettingLoaded).timer.pomodoroTime,
-  //       shortBreak:
-  //           event.shortBreak ?? (state as SettingLoaded).timer.shortBreak,
-  //       longBreak: event.longBreak ?? (state as SettingLoaded).timer.longBreak,
-  //       pomodoroSequence: event.pomodoroSequence ??
-  //           (state as SettingLoaded).timer.pomodoroSequence,
-  //     );
-
-  //     ts.fold(
-  //       (err) => emit((state as SettingLoaded)
-  //           .copyWith(error: ErrorObject.mapFailureToError(err))),
-  //       (data) => null,
-  //     );
-  //   }
-  // }
 
   _onSettingChanged(_SettingChanged event, Emitter<SettingState> emit) {
     _logger?.log(

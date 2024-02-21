@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
 
 import '../../models/setting_hive_model.dart';
@@ -15,7 +18,13 @@ abstract class SettingRepositoryDB {
 
   SoundSettingModel getSound();
 
-  Future<void> storeSoundSetting({bool? playSound, String? audioPath});
+  Future<void> storeSoundSetting({
+    bool? playSound,
+    String? audioPath,
+    SoundType? type,
+    Uint8List? bytesData,
+    String? importedFileName,
+  });
 }
 
 class SettingRepositoryHiveDB implements SettingRepositoryDB {
@@ -93,17 +102,31 @@ class SettingRepositoryHiveDB implements SettingRepositoryDB {
   }
 
   @override
-  Future<void> storeSoundSetting({bool? playSound, String? audioPath}) async {
+  Future<void> storeSoundSetting({
+    bool? playSound,
+    String? audioPath,
+    SoundType? type,
+    Uint8List? bytesData,
+    String? importedFileName,
+  }) async {
     _logger?.log(Level.info, '''[SettingRepositoryHiveDB(storeSound)]: {
       isSoundOn: $playSound,
       audioPath: $audioPath,
+      soundType: $type,
+      bytesData: ${bytesData != null ? 'bytesData' : 'null'},
+      importedFileName: $importedFileName,
     }''');
 
     _settingModel = SettingHiveModel(
       timerSetting: _settingModel.timerSetting,
       soundSetting: SoundSettingModel(
         playSound: playSound ?? _settingModel.soundSetting.playSound,
-        audioPath: audioPath ?? _settingModel.soundSetting.audioPath,
+        defaultAudioPath:
+            audioPath ?? _settingModel.soundSetting.defaultAudioPath,
+        type: type?.valueAsString ?? _settingModel.soundSetting.type,
+        bytesData: bytesData ?? _settingModel.soundSetting.bytesData,
+        importedFileName:
+            importedFileName ?? _settingModel.soundSetting.importedFileName,
       ),
     );
 

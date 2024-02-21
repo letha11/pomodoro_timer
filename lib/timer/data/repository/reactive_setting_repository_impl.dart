@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 
 import '../../../core/exceptions/failures.dart';
 import '../../../core/success.dart';
@@ -58,17 +60,23 @@ class ReactiveSettingRepositoryImpl extends ReactiveSettingRepository {
   @override
   Future<Either<Failure, Success>> storeSoundSetting({
     bool? playSound,
-    String? audioPath,
+    SoundType? type,
+    Uint8List? bytesData,
+    String? importedFileName,
   }) async {
     try {
       SoundSettingModel newSoundSettingModel = SoundSettingModel(
-        audioPath: audioPath,
         playSound: playSound,
+        type: type?.valueAsString,
+        bytesData: bytesData,
+        importedFileName: importedFileName,
       );
 
       await _dbRepository.storeSoundSetting(
-        audioPath: newSoundSettingModel.audioPath,
         playSound: newSoundSettingModel.playSound,
+        type: newSoundSettingModel.type.toSoundType,
+        bytesData: newSoundSettingModel.bytesData,
+        importedFileName: newSoundSettingModel.importedFileName,
       );
 
       _soundController.sink.add(newSoundSettingModel.toEntity());

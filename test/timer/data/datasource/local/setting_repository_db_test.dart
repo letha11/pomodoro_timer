@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
 import 'package:pomodoro_timer/timer/data/models/setting_hive_model.dart';
 
@@ -105,21 +106,27 @@ void main() {
 
       // assert
       expect(soundSetting.playSound, equals(true));
-      expect(soundSetting.audioPath, equals('assets/audio/alarm.wav'));
+      expect(soundSetting.defaultAudioPath, equals('assets/audio/alarm.wav'));
     });
   });
 
   group('storeSound', () {
-    test('should call box.put with the changed settingModel to store the changed setting', () {
-      const newSettingModel = SettingHiveModel(
+    test(
+        'should call box.put with the changed settingModel to store the changed setting',
+        () {
+      final newSettingModel = SettingHiveModel(
         soundSetting: SoundSettingModel(
           playSound: true,
-          audioPath: 'assets/audio/alarm-new.mp3',
+          defaultAudioPath: 'assets/audio/alarm-new.mp3',
+          type: SoundType.defaults.valueAsString,
+          bytesData: null,
         ),
       );
       settingRepository.storeSoundSetting(
         playSound: newSettingModel.soundSetting.playSound,
-        audioPath: newSettingModel.soundSetting.audioPath,
+        audioPath: newSettingModel.soundSetting.defaultAudioPath,
+        type: newSettingModel.soundSetting.type.toSoundType,
+        bytesData: newSettingModel.soundSetting.bytesData,
       );
 
       verify(box.put(0, newSettingModel)).called(1);

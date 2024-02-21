@@ -6,6 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:clock/clock.dart';
+import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
@@ -163,7 +164,15 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
             await Future.delayed(const Duration(seconds: 1));
 
             if (soundSetting.playSound) {
-              _audioPlayer.playSound(soundSetting.audioPath);
+              // if (soundSetting.type.isDefault)
+              // then play with audiopath
+              // else *which mean it's an imported or soundSetting.type.isImported
+              // then play with Uint8List / source them and then play 
+              if(soundSetting.type.isDefault) {
+                _audioPlayer.playSound(soundSetting.defaultAudioPath);
+              } else {
+                _audioPlayer.playSoundFromUint8List(soundSetting.bytesData!);
+              }
             }
 
             if (type == TimerType.pomodoro &&

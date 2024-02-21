@@ -110,6 +110,7 @@ class _HomeState extends State<Home> {
             child: SvgPicture.asset(
               'assets/images/setting.svg',
               width: 24,
+              height: 24,
             ),
           ),
         ),
