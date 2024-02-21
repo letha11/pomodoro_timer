@@ -190,8 +190,13 @@ class _SoundsSettingState extends State<SoundsSetting> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(soundType.isDefault ? "Default" : customAudioLabel,
-                    style: Theme.of(context).textTheme.bodySmall),
+                Flexible(
+                  child: Text(
+                    soundType.isDefault ? "Default" : customAudioLabel,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 Row(
                   children: [
                     GestureDetector(
@@ -262,26 +267,31 @@ class SoundSettingTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.timer,
-                  size: 24,
-                  color: itemColor,
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  children: [
-                    Text(
-                      label,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: itemColor),
+            Flexible(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timer,
+                    size: 24,
+                    color: itemColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Column(
+                      children: [
+                        Text(
+                          label,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: itemColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
             if (actions == null)
               GestureDetector(
