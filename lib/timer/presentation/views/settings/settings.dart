@@ -43,7 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 StyledContainer(
                   child: TabBar(
-                    labelStyle: Theme.of(context).textTheme.bodySmall,
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.white),
                     unselectedLabelColor: Colors.black,
                     unselectedLabelStyle: Theme.of(context).textTheme.bodySmall,
                     indicator: const BoxDecoration(

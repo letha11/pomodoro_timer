@@ -181,6 +181,9 @@ class _SoundsSettingState extends State<SoundsSetting> {
           children: [
             TitleSwitch(
               title: "Play Sound",
+              initialState: (context.read<SettingBloc>().state as SettingLoaded)
+                  .soundSetting
+                  .playSound,
               onToggle: (val) =>
                   context.read<SettingBloc>().add(SettingSet(playSound: val)),
             ),
