@@ -34,7 +34,7 @@ class StyledContainer extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: active ? Colors.white : Colors.black, // active
-            offset: const Offset(3.5, 3.5),
+            offset: const Offset(3, 3),
           ),
         ],
         borderRadius: BorderRadius.all(Radius.circular(borderRadius)),

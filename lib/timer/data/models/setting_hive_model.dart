@@ -49,9 +49,9 @@ class TimerSettingModel extends Equatable {
     int? shortBreak,
     int? longBreak,
     bool? pomodoroSequence,
-  })  : pomodoroTime = pomodoroTime ?? 25,
-        shortBreak = shortBreak ?? 5,
-        longBreak = longBreak ?? 15,
+  })  : pomodoroTime = pomodoroTime ?? 1500,
+        shortBreak = shortBreak ?? 300,
+        longBreak = longBreak ?? 900,
         pomodoroSequence = pomodoroSequence ?? true;
 
   @override
@@ -88,7 +88,7 @@ class SoundSettingModel extends Equatable {
     this.importedFileName,
   })  : playSound = playSound ?? true,
         defaultAudioPath = defaultAudioPath ?? 'assets/audio/alarm.wav',
-        type = type ?? 'default';
+        type = type ?? 'defaults';
 
   @override
   List<Object?> get props =>

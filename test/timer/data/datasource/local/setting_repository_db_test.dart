@@ -65,12 +65,14 @@ void main() {
   group('getTimer', () {
     test('should return default value when nothing changed', () async {
       // act
+      const defaultTimerSetting = TimerSettingModel();
       TimerSettingModel timerSetting = settingRepository.getTimer();
 
       // assert
-      expect(timerSetting.pomodoroTime, equals(25));
-      expect(timerSetting.shortBreak, equals(5));
-      expect(timerSetting.longBreak, equals(15));
+      expect(
+          timerSetting.pomodoroTime, equals(defaultTimerSetting.pomodoroTime));
+      expect(timerSetting.shortBreak, equals(defaultTimerSetting.shortBreak));
+      expect(timerSetting.longBreak, equals(defaultTimerSetting.longBreak));
     });
   });
 

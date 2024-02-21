@@ -102,9 +102,11 @@ class TimerSettings extends StatelessWidget {
   }
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     pomodoroTime = sl<TimeConverter>().secondToMinutes(
-        (context.read<SettingBloc>().state as SettingLoaded).timer.pomodoroTime);
+        (context.read<SettingBloc>().state as SettingLoaded)
+            .timer
+            .pomodoroTime);
     breakTime = sl<TimeConverter>().secondToMinutes(
         (context.read<SettingBloc>().state as SettingLoaded).timer.shortBreak);
     longBreakTime = sl<TimeConverter>().secondToMinutes(
@@ -139,8 +141,12 @@ Widget build(BuildContext context) {
             const SizedBox(height: 16),
             TitleSwitch(
               title: "Pomodoro Sequence",
-              initialState: (context.read<SettingBloc>().state as SettingLoaded).timer.pomodoroSequence,
-              onToggle: (val) => context.read<SettingBloc>().add(SettingSet(pomodoroSequence: val)),
+              initialState: (context.read<SettingBloc>().state as SettingLoaded)
+                  .timer
+                  .pomodoroSequence,
+              onToggle: (val) => context
+                  .read<SettingBloc>()
+                  .add(SettingSet(pomodoroSequence: val)),
             ),
           ],
         ),
