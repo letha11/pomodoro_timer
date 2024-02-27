@@ -6,7 +6,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:clock/clock.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pomodoro_timer/core/constants.dart';
+import 'package:pomodoro_timer/core/utils/notifications.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
@@ -47,6 +49,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final TimeConverter timeConverter;
   final GetTimerUsecase _getTimerUsecase;
   final GetSoundSettingUsecase _getSoundSettingUsecase;
+  final NotificationHelper? _notificationHelper;
   late TimerSettingEntity timer;
   late SoundSettingEntity soundSetting;
   int _pomodoroCounter = 3;
@@ -64,17 +67,20 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     required GetTimerUsecase getTimerUsecase,
     required GetSoundSettingUsecase getSoundSettingUsecase,
     required AudioPlayerL audioPlayer,
+    NotificationHelper? notificationHelper,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
         _countdownSubscription = streamSubscription,
         _audioPlayer = audioPlayer,
+        _notificationHelper = notificationHelper,
         _logger = logger,
         _getTimerUsecase = getTimerUsecase,
         _getSoundSettingUsecase = getSoundSettingUsecase,
         super(const TimerCounterInitial('00:00', 0)) {
     _subscribeTimer();
     _subscribeSoundSetting();
+    _notificationHelper?.initialize();
 
     on<TimerCounterStarted>(_onTimerStarted);
     on<TimerCounterPaused>(_onTimerPaused);
@@ -109,7 +115,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   void _subscribeTimer() {
     final result = _getTimerUsecase();
 
-    result.fold( 
+    result.fold(
       (err) => emit(
         TimerCounterFailure(
           ErrorObject.mapFailureToError(err),
@@ -157,6 +163,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
           _countdownSubscription = data.listen((d) {
             add(_TimerCounterTicked(
                 formattedDuration: timeConverter.fromSeconds(d)));
+            _notificationHelper?.showTimerCounter(
+              type.toShortString(),
+              timeConverter.fromSeconds(d),
+            );
           }, onDone: () async {
             _pomodoroCounter++;
 
@@ -167,8 +177,8 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
               // if (soundSetting.type.isDefault)
               // then play with audiopath
               // else *which mean it's an imported or soundSetting.type.isImported
-              // then play with Uint8List / source them and then play 
-              if(soundSetting.type.isDefault) {
+              // then play with Uint8List / source them and then play
+              if (soundSetting.type.isDefault) {
                 _audioPlayer.playSound(soundSetting.defaultAudioPath);
               } else {
                 _audioPlayer.playSoundFromUint8List(soundSetting.bytesData!);
@@ -200,6 +210,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
       _countdownSubscription!.pause();
 
       emit(TimerCounterPause(state.duration));
+      _notificationHelper?.showTimerCounter(
+        type.toShortString(),
+        state.duration,
+      );
     }
   }
 
@@ -214,6 +228,10 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
       // `TimerCounterInProgress` with the current duration
       emit(TimerCounterInProgress(state.duration));
       _countdownSubscription?.resume();
+      _notificationHelper?.showTimerCounter(
+        type.toShortString(),
+        state.duration,
+      );
     }
   }
 
@@ -224,6 +242,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
       emit(TimerCounterInitial(
           timeConverter.fromSeconds(_duration), _timeStamps));
+      _notificationHelper?.dismiss(timerCounterNotificationId);
     }
   }
 
@@ -241,6 +260,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
 
       emit(TimerCounterInitial(
           timeConverter.fromSeconds(_duration), _timeStamps));
+      _notificationHelper?.dismiss(timerCounterNotificationId);
     }
   }
 

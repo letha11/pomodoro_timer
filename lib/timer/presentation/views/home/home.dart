@@ -98,7 +98,8 @@ class _HomeState extends State<Home> {
           child: StyledContainer(
             padding: const EdgeInsets.all(5),
             borderRadius: 50,
-            onTap: () => Navigator.push(
+            onTap: () {
+              Navigator.push(
               context,
               CupertinoPageRoute(
                 builder: (_) => BlocProvider.value(
@@ -106,7 +107,8 @@ class _HomeState extends State<Home> {
                   child: const SettingsScreen(),
                 ),
               ),
-            ),
+              );
+            },
             child: SvgPicture.asset(
               'assets/images/setting.svg',
               width: 24,

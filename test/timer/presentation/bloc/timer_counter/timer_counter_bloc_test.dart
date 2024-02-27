@@ -14,6 +14,7 @@ import 'package:pomodoro_timer/core/exceptions/failures.dart';
 import 'package:pomodoro_timer/core/utils/audio_player.dart';
 import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
+import 'package:pomodoro_timer/core/utils/notifications.dart';
 import 'package:pomodoro_timer/core/utils/time_converter.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
@@ -28,6 +29,7 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_coun
   MockSpec<GetTimerUsecase>(),
   MockSpec<GetSoundSettingUsecase>(),
   MockSpec<AudioPlayerLImpl>(),
+  MockSpec<NotificationHelper>(),
 ])
 import 'timer_counter_bloc_test.mocks.dart';
 
@@ -54,6 +56,7 @@ void main() {
   late TimeConverter timeConverter;
   late GetTimerUsecase getTimerUsecase;
   late GetSoundSettingUsecase getSoundSettingUsecase;
+  late MockNotificationHelper notificationHelper;
   late int timeStamps;
   late AudioPlayerL audioPlayer;
 
@@ -65,6 +68,7 @@ void main() {
     timeConverter = MockTimeConverter();
     getTimerUsecase = MockGetTimerUsecase();
     getSoundSettingUsecase = MockGetSoundSettingUsecase();
+    notificationHelper = MockNotificationHelper();
     timeStamps =
         Clock.fixed(DateTime(2022, 09, 01)).now().millisecondsSinceEpoch;
     audioPlayer = MockAudioPlayerLImpl();
@@ -87,6 +91,7 @@ void main() {
               streamSubscription: subscription,
               audioPlayer: audioPlayer,
               timeConverter: timeConverter,
+              notificationHelper: notificationHelper,
             ));
 
     timerStreamController.add(timer);

@@ -5,6 +5,7 @@
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
@@ -33,4 +34,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
 </manifest>

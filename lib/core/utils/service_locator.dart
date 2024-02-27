@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:pomodoro_timer/core/utils/notifications.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/set_sound_setting.dart';
@@ -18,6 +19,7 @@ final sl = GetIt.instance;
 
 void init() {
   // Utils
+  sl.registerLazySingleton<NotificationHelper>(() => NotificationHelperImpl());
   sl.registerLazySingleton(() => const Countdown());
   sl.registerLazySingleton(() => TimeConverter());
   sl.registerLazySingleton<AudioPlayerL>(() => AudioPlayerLImpl());
@@ -25,19 +27,12 @@ void init() {
 
   sl.registerSingletonAsync<SettingRepositoryDB>(
     () async => await SettingRepositoryHiveDB.create(logger: sl()),
-    // () async {
-    //   final settingRepositoryHiveDB = await SettingRepositoryHiveDB.create(logger: sl());
-    //   return settingRepositoryHiveDB;
-    // },
   );
   sl.registerLazySingleton<ReactiveSettingRepository>(
       () => ReactiveSettingRepositoryImpl(
             dbRepository: sl(),
             logger: sl(),
           ));
-  // sl.registerLazySingleton<TimerRepository>(
-  //   () => TimerRepositoryImpl(timerRepositoryDB: sl(), logger: sl()),
-  // );
 
   // Usecase
   sl.registerLazySingleton(() => GetTimerUsecase(sl()));
@@ -59,6 +54,7 @@ void init() {
     () => TimerCounterBloc(
       countdown: sl(),
       timeConverter: sl(),
+      notificationHelper: sl(),
       logger: sl(),
       getTimerUsecase: sl(),
       getSoundSettingUsecase: sl(),

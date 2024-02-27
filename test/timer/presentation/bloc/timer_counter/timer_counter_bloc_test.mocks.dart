@@ -7,11 +7,14 @@ import 'dart:async' as _i3;
 import 'dart:typed_data' as _i13;
 
 import 'package:dartz/dartz.dart' as _i2;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as _i15;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
 import 'package:pomodoro_timer/core/exceptions/failures.dart' as _i5;
 import 'package:pomodoro_timer/core/utils/audio_player.dart' as _i12;
 import 'package:pomodoro_timer/core/utils/countdown.dart' as _i4;
+import 'package:pomodoro_timer/core/utils/notifications.dart' as _i14;
 import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i7;
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart'
     as _i11;
@@ -323,6 +326,59 @@ class MockAudioPlayerLImpl extends _i1.Mock implements _i12.AudioPlayerLImpl {
         Invocation.method(
           #playSoundFromUint8List,
           [bytes],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [NotificationHelper].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockNotificationHelper extends _i1.Mock
+    implements _i14.NotificationHelper {
+  @override
+  void initialize(
+          {void Function(_i15.NotificationResponse)?
+              onDidReceiveNotificationResponse}) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #initialize,
+          [],
+          {#onDidReceiveNotificationResponse: onDidReceiveNotificationResponse},
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void show(
+    String? title,
+    String? body, {
+    String? payload,
+  }) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #show,
+          [
+            title,
+            body,
+          ],
+          {#payload: payload},
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void showTimerCounter(
+    String? title,
+    String? body,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #showTimerCounter,
+          [
+            title,
+            body,
+          ],
         ),
         returnValueForMissingStub: null,
       );
