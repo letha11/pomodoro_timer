@@ -38,8 +38,8 @@ void main() {
   const timer = TimerSettingEntity(
     pomodoroTime: duration,
     shortBreak: 3,
-    longBreak: 5,
-    pomodoroSequence: false,
+    longBreak: 7,
+    pomodoroSequence: true,
   );
   SoundSettingEntity soundSetting = SoundSettingEntity(
     playSound: true,
@@ -48,7 +48,7 @@ void main() {
     bytesData: Uint8List(100),
   );
 
-  late Countdown countdown;
+  late MockCountdown countdown;
   late TimerCounterBloc bloc;
   late StreamSubscription<int>? subscription;
   late StreamController<TimerSettingEntity> timerStreamController;
@@ -75,6 +75,7 @@ void main() {
 
     when(timeConverter.fromSeconds(timer.pomodoroTime)).thenReturn('00:05');
     when(timeConverter.fromSeconds(timer.shortBreak)).thenReturn("00:03");
+    when(timeConverter.fromSeconds(timer.longBreak)).thenReturn("00:07");
     when(getTimerUsecase.call())
         .thenReturn(Right(timerStreamController.stream));
     when(getSoundSettingUsecase())
@@ -112,8 +113,15 @@ void main() {
   group('TimerCounterStarted event', () {
     late StreamController<int> timerCounterStartedController;
 
+    late StreamController<int> pomodoroController;
+    late StreamController<int> shortBreakController;
+    late StreamController<int> longBreakController;
+
     setUp(() {
       timerCounterStartedController = StreamController<int>();
+      pomodoroController = StreamController<int>.broadcast();
+      shortBreakController = StreamController<int>.broadcast();
+      longBreakController = StreamController<int>.broadcast();
     });
 
     blocTest(
@@ -310,6 +318,91 @@ void main() {
         verifyNever(audioPlayer.playSound(soundSetting.defaultAudioPath));
       },
     );
+
+    blocTest<TimerCounterBloc, TimerCounterState>(
+      'pomodoroSequence should change to longBreak when pomodoroCounter is 4',
+      build: () => bloc,
+      setUp: () async {
+        when(countdown.count(duration - 1))
+            .thenReturn(Right(pomodoroController.stream));
+        when(countdown.count(timer.shortBreak - 1))
+            .thenReturn(Right(shortBreakController.stream));
+        when(countdown.count(timer.longBreak - 1))
+            .thenReturn(Right(longBreakController.stream));
+      },
+      act: (b) async {
+        // 1st Pomodoro
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(duration - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(timer.shortBreak - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        // 2nd Pomodoro
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(duration - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(timer.shortBreak - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        // 3th Pomodoro
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(duration - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(timer.shortBreak - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        // 4th Pomodoro
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(duration - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+
+        // Long Break
+        b.add(TimerCounterStarted());
+        await untilCalled(countdown.count(timer.longBreak - 1));
+        await pomodoroController.close();
+        await shortBreakController.close();
+        await longBreakController.close();
+      },
+      expect: () => <TimerCounterState>[
+        // 1st Pomodoro
+        TimerCounterInProgress("00:05"), // start of the stream
+        TimerCounterInitial("00:03", timeStamps),
+        TimerCounterInProgress("00:03"),
+        TimerCounterInitial("00:05", timeStamps),
+
+        // 2nd Pomodoro
+        TimerCounterInProgress("00:05"),
+        TimerCounterInitial("00:03", timeStamps),
+        TimerCounterInProgress("00:03"),
+        TimerCounterInitial("00:05", timeStamps),
+
+        // // 3th Pomodoro
+        TimerCounterInProgress("00:05"),
+        TimerCounterInitial("00:03", timeStamps),
+        TimerCounterInProgress("00:03"),
+        TimerCounterInitial("00:05", timeStamps),
+
+        // 4th Pomodoro
+        TimerCounterInProgress("00:05"),
+        TimerCounterInitial("00:07", timeStamps),
+        TimerCounterInProgress("00:07"),
+        TimerCounterInitial("00:05", timeStamps),
+      ],
+    );
   });
 
   group('TimerCounterPaused event', () {
@@ -424,7 +517,7 @@ void main() {
         pomodoroTime: 3,
         shortBreak: 2,
         longBreak: 4,
-        pomodoroSequence: false,
+        pomodoroSequence: true,
       );
 
       timerStreamController.add(timer);

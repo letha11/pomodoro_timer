@@ -52,7 +52,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final NotificationHelper? _notificationHelper;
   late TimerSettingEntity timer;
   late SoundSettingEntity soundSetting;
-  int _pomodoroCounter = 3;
+  int _pomodoroCounter = 0;
   TimerType type = TimerType.pomodoro;
 
   StreamSubscription<int>? _countdownSubscription;
@@ -149,6 +149,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
       _countdownSubscription?.cancel();
       _audioPlayer.stopSound();
 
+      // print(_duration - 1);
       await _countdown.count(_duration - 1).fold(
         (err) {
           _logger?.log(Level.warning, "[count] {duration: $_duration}");
@@ -168,10 +169,12 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
               timeConverter.fromSeconds(d),
             );
           }, onDone: () async {
-            _pomodoroCounter++;
+            if(type == TimerType.pomodoro) {
+              _pomodoroCounter++;
+            }
 
             _logger?.log(Level.debug, "Stream Finished");
-            await Future.delayed(const Duration(seconds: 1));
+            // await Future.delayed(const Duration(seconds: 1));
 
             if (soundSetting.playSound) {
               // if (soundSetting.type.isDefault)
