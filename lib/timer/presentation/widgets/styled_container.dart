@@ -55,6 +55,7 @@ class StyledContainer extends StatelessWidget {
               child: child ??
                   Text(
                     text!,
+                    textAlign: TextAlign.center,
                     style: textStyle ??
                         Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: active ? Colors.white : Colors.black,

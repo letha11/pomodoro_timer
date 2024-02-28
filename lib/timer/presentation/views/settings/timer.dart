@@ -82,6 +82,7 @@ class TimerSettings extends StatelessWidget {
               _setTimer(ctx);
             },
             inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp('^0+')),
               FilteringTextInputFormatter.digitsOnly,
             ],
             style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
