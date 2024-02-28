@@ -18,13 +18,11 @@ class SoundsSetting extends StatefulWidget {
   State<SoundsSetting> createState() => _SoundsSettingState();
 }
 
-// TODO:
-// 1. Store the imported sound into local storage
-// 2. Store the soundType so we know what the user picked before
 class _SoundsSettingState extends State<SoundsSetting> {
   SoundType soundType = SoundType.defaults;
   String customAudioLabel = '';
   Uint8List? importedAudioBytes;
+  bool isPlaying = false;
 
   _showBottomSheet(BuildContext context) async => await showModalBottomSheet(
         context: context,
@@ -36,18 +34,9 @@ class _SoundsSettingState extends State<SoundsSetting> {
           ),
         ),
         builder: (_) {
+          bool isDefaultAudioPlaying = false;
+          bool isImportedAudioPlaying = false;
           return StatefulBuilder(builder: (_, setStateSB) {
-            Color testColor = Colors.black;
-            if (importedAudioBytes == null) {
-              testColor = Colors.grey;
-            } else {
-              if (soundType.isImported) {
-                testColor = Colors.white;
-              } else {
-                testColor = Colors.black;
-              }
-            }
-
             return Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 25.0, vertical: 26),
@@ -76,7 +65,33 @@ class _SoundsSettingState extends State<SoundsSetting> {
                           .read<SettingBloc>()
                           .add(SettingSet(type: soundType));
                     },
-                    onPlayTapped: playDefaultAudio,
+                    // onPlayTapped: playDefaultAudio,
+                    actions: [
+                      GestureDetector(
+                        onTap: isDefaultAudioPlaying
+                            ? () {
+                                stopAudio();
+                                setStateSB(() {
+                                  isDefaultAudioPlaying = false;
+                                });
+                              }
+                            : () {
+                                playDefaultAudio();
+                                setStateSB(() {
+                                  isDefaultAudioPlaying = true;
+                                  isImportedAudioPlaying = false;
+                                });
+                              },
+                        child: SvgPicture.asset(
+                          isDefaultAudioPlaying
+                              ? 'assets/images/stop.svg'
+                              : 'assets/images/play.svg',
+                          colorFilter: ColorFilter.mode(
+                              soundType.isDefault ? Colors.white : Colors.black,
+                              BlendMode.srcIn),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   SoundSettingTile(
@@ -95,12 +110,30 @@ class _SoundsSettingState extends State<SoundsSetting> {
                     actions: [
                       GestureDetector(
                         onTap: importedAudioBytes != null
-                            ? playImportedAudio
+                            ? () {
+                                if (isImportedAudioPlaying) {
+                                  stopAudio();
+                                  setStateSB(() {
+                                    isImportedAudioPlaying = false;
+                                  });
+                                } else {
+                                  playImportedAudio();
+                                  setStateSB(() {
+                                    isImportedAudioPlaying = true;
+                                    isDefaultAudioPlaying = false;
+                                  });
+                                }
+                              }
                             : null,
                         child: SvgPicture.asset(
-                          'assets/images/play.svg',
-                          colorFilter:
-                              ColorFilter.mode(testColor, BlendMode.srcIn),
+                          isImportedAudioPlaying
+                              ? 'assets/images/stop.svg'
+                              : 'assets/images/play.svg',
+                          colorFilter: ColorFilter.mode(
+                              soundType.isImported
+                                  ? Colors.white
+                                  : Colors.black,
+                              BlendMode.srcIn),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -147,7 +180,7 @@ class _SoundsSettingState extends State<SoundsSetting> {
           });
         },
       ).whenComplete(() {
-        pickAudioDismissed();
+        stopAudio();
         setState(() {});
       });
 
@@ -157,8 +190,14 @@ class _SoundsSettingState extends State<SoundsSetting> {
   void playImportedAudio() =>
       sl<AudioPlayerL>().playSoundFromUint8List(importedAudioBytes!);
 
-  void pickAudioDismissed() {
+  void stopAudio() {
     sl<AudioPlayerL>().stopSound();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopAudio();
   }
 
   @override
@@ -201,14 +240,27 @@ class _SoundsSettingState extends State<SoundsSetting> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        if (soundType.isDefault) {
-                          playDefaultAudio();
+                        if (isPlaying) {
+                          stopAudio();
+                          setState(() {
+                            isPlaying = false;
+                          });
                         } else {
-                          playImportedAudio();
+                          if (soundType.isDefault) {
+                            playDefaultAudio();
+                          } else {
+                            playImportedAudio();
+                          }
+
+                          setState(() {
+                            isPlaying = true;
+                          });
                         }
                       },
                       child: SvgPicture.asset(
-                        'assets/images/play.svg',
+                        isPlaying
+                            ? 'assets/images/stop.svg'
+                            : 'assets/images/play.svg',
                         width: 24,
                       ),
                     ),
@@ -216,6 +268,12 @@ class _SoundsSettingState extends State<SoundsSetting> {
                     GestureDetector(
                       onTap: () async {
                         _showBottomSheet(context);
+                        if (isPlaying) {
+                          stopAudio();
+                          setState(() {
+                            isPlaying = false;
+                          });
+                        }
                       },
                       child: SvgPicture.asset(
                         'assets/images/setting.svg',

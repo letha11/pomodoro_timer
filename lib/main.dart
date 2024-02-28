@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,8 +32,7 @@ void main() async {
   );
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  // TODO: uncomment this line to enable crashlytics
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   // Specifies orientation for the application to portrait only
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
