@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
@@ -41,12 +42,10 @@ class HomeScreen extends StatelessWidget {
             },
             builder: (context, state) {
               if (state is SettingLoaded) {
+                FlutterNativeSplash.remove();
                 return const Home();
-              } else if (state is SettingFailed) {
-                // Failure
-                return const Text('0');
               } else {
-                return const CircularProgressIndicator();
+                return Container();
               }
             },
           ),
@@ -100,13 +99,13 @@ class _HomeState extends State<Home> {
             borderRadius: 50,
             onTap: () {
               Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (_) => BlocProvider.value(
-                  value: BlocProvider.of<SettingBloc>(context),
-                  child: const SettingsScreen(),
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: BlocProvider.of<SettingBloc>(context),
+                    child: const SettingsScreen(),
+                  ),
                 ),
-              ),
               );
             },
             child: SvgPicture.asset(

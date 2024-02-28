@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
@@ -12,7 +13,8 @@ import 'timer/presentation/blocs/timer_counter/timer_counter_bloc.dart';
 import 'timer/presentation/views/home/home.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Hive.initFlutter();
   Hive.registerAdapter(SoundSettingModelAdapter());
