@@ -19,6 +19,7 @@ import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/core/utils/time_converter.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/logger.dart';
+import 'package:vibration/vibration.dart';
 
 part 'timer_counter_event.dart';
 
@@ -185,6 +186,14 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
                 _audioPlayer.playSound(soundSetting.defaultAudioPath);
               } else {
                 _audioPlayer.playSoundFromUint8List(soundSetting.bytesData!);
+              }
+            } else {
+              if(await Vibration.hasCustomVibrationsSupport() ?? false) {
+                Vibration.vibrate(duration: 1000);
+              } else {
+                Vibration.vibrate();
+                await Future.delayed(const Duration(milliseconds: 500));
+                Vibration.vibrate();
               }
             }
 
