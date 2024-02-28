@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pomodoro_timer/core/utils/formatters.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 import 'dart:async';
 
@@ -60,6 +61,14 @@ class TimerSettings extends StatelessWidget {
   }
 
   _timeForm(BuildContext ctx, String title, TextEditingController controller) {
+    FocusNode focusNode = FocusNode();
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus && controller.text.substring(0, 1) == "0") {
+        controller.text = "1";
+        _setTimer(ctx);
+      }
+    });
+
     return Column(
       children: [
         Text(title, style: Theme.of(ctx).textTheme.bodySmall),
@@ -70,19 +79,24 @@ class TimerSettings extends StatelessWidget {
             controller: controller,
             cursorColor: Colors.black,
             keyboardType: TextInputType.number,
+            focusNode: focusNode,
             textAlign: TextAlign.center,
-
             onChanged: (val) {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
+              if (val.substring(0, 1) == "0") return;
               _debounce = Timer(const Duration(seconds: 2), () {
                 _setTimer(ctx);
               });
             },
             onEditingComplete: () {
+              if (controller.text.substring(0, 1) == "0") {
+                controller.text = "1";
+              }
+
               _setTimer(ctx);
             },
             inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp('^0+')),
+              EmptyFormatter(),
               FilteringTextInputFormatter.digitsOnly,
             ],
             style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
