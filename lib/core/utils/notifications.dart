@@ -7,13 +7,17 @@ class NotificationChannel {
   final String name;
   final String description;
   final bool ongoing;
+  final bool channelShowBadge;
+  final Importance importance;
   final List<AndroidNotificationAction>? actions;
 
   const NotificationChannel({
     required this.id,
     required this.name,
     required this.description,
+    this.importance = Importance.defaultImportance,
     this.ongoing = false,
+    this.channelShowBadge = true,
     this.actions,
   });
 
@@ -24,8 +28,9 @@ class NotificationChannel {
         channelDescription: description,
         ongoing: ongoing,
         actions: actions,
-        importance: Importance.max,
+        importance: importance,
         priority: Priority.high,
+        channelShowBadge: channelShowBadge,
       );
 }
 
@@ -74,13 +79,26 @@ class NotificationHelperImpl extends NotificationHelper {
       description:
           'This is just some general notification, you can turn this off if you don\'t care about any notification other than the timer',
       actions: <AndroidNotificationAction>[
-        AndroidNotificationAction('id_1', 'Play',
-            showsUserInterface: true, cancelNotification: false),
-        AndroidNotificationAction('id_2', 'Pause',
-            showsUserInterface: true, cancelNotification: false),
-        AndroidNotificationAction('id_3', 'Skip',
-            showsUserInterface: true, cancelNotification: false),
+        AndroidNotificationAction(
+          'id_1',
+          'Play',
+          showsUserInterface: true,
+          cancelNotification: false,
+        ),
+        AndroidNotificationAction(
+          'id_2',
+          'Pause',
+          showsUserInterface: true,
+          cancelNotification: false,
+        ),
+        AndroidNotificationAction(
+          'id_3',
+          'Skip',
+          showsUserInterface: true,
+          cancelNotification: false,
+        ),
       ],
+      importance: Importance.max,
     ).androidNotificationDetails;
 
     final notificationDetails = NotificationDetails(
@@ -105,6 +123,7 @@ class NotificationHelperImpl extends NotificationHelper {
       name: 'Timer Counter',
       description: 'This is the timer counter notification',
       ongoing: true,
+      channelShowBadge: false,
     ).androidNotificationDetails;
 
     final notificationDetails = NotificationDetails(
