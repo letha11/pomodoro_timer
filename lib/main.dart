@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:pomodoro_timer/core/utils/image_utils.dart';
 import 'package:pomodoro_timer/timer/presentation/blocs/setting/setting_bloc.dart';
 
 import 'core/utils/service_locator.dart';
@@ -39,8 +40,21 @@ void main() async {
   runApp(const App());
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ImageUtils.precacheSvgImages();
+    ImageUtils.precacheImages(context);
+  }
 
   Widget _build(AsyncSnapshot snapshot) {
     if (snapshot.hasData) {
