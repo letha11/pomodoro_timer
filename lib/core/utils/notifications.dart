@@ -8,6 +8,8 @@ class NotificationChannel {
   final String description;
   final bool ongoing;
   final bool channelShowBadge;
+  final bool enableVibration;
+  final bool playSound;
   final Importance importance;
   final List<AndroidNotificationAction>? actions;
 
@@ -18,6 +20,8 @@ class NotificationChannel {
     this.importance = Importance.defaultImportance,
     this.ongoing = false,
     this.channelShowBadge = true,
+    this.enableVibration = true,
+    this.playSound = true,
     this.actions,
   });
 
@@ -31,6 +35,8 @@ class NotificationChannel {
         importance: importance,
         priority: Priority.high,
         channelShowBadge: channelShowBadge,
+        enableVibration: enableVibration,
+        playSound: playSound, 
       );
 }
 
@@ -124,6 +130,8 @@ class NotificationHelperImpl extends NotificationHelper {
       description: 'This is the timer counter notification',
       ongoing: true,
       channelShowBadge: false,
+      enableVibration: false,
+      playSound: false,
     ).androidNotificationDetails;
 
     final notificationDetails = NotificationDetails(
