@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pomodoro_timer">
+    package="com.letha.pomo_clock">
     <application
         android:label="PomoClock"
         android:name="${applicationName}"

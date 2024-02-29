@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -54,9 +51,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCwd99y02K7jwdiLWliKxIY6cajjeGubFo',
-    appId: '1:732476650824:android:502c7275309816e70e6f7d',
+    appId: '1:732476650824:android:15262b044db932f90e6f7d',
     messagingSenderId: '732476650824',
     projectId: 'pomodoro-crashlytics',
     storageBucket: 'pomodoro-crashlytics.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyA53cdKNs2vQk3J5pOZIp6WFTSCUEwqXps',
+    appId: '1:732476650824:ios:25d4870a85ecf0030e6f7d',
+    messagingSenderId: '732476650824',
+    projectId: 'pomodoro-crashlytics',
+    storageBucket: 'pomodoro-crashlytics.appspot.com',
+    iosClientId: '732476650824-u6icml2e49pqhogvafdsvb51c43u2i13.apps.googleusercontent.com',
+    iosBundleId: 'com.example.pomodoroTimer',
   );
 }

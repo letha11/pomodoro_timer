@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:732476650824:android:502c7275309816e70e6f7d",
+        "mobilesdk_app_id": "1:732476650824:android:15262b044db932f90e6f7d",
         "android_client_info": {
-          "package_name": "com.example.pomodoro_timer"
+          "package_name": "com.letha.pomo_clock"
         }
       },
       "oauth_client": [
