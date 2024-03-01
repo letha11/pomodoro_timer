@@ -5,6 +5,8 @@ on:
     branches:
       - main
   push:
+    tags : 
+      - v*
     branches:
       - main
 
@@ -49,16 +51,8 @@ jobs:
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
 
-      - name: AutoTag Version Flutter
-        uses: mike-500/action-autotag@4.0.1
-        with:
-          GITHUB_TOKEN: "${{ secrets.TOKEN }}"
-
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
           TOKEN: ${{ secrets.TOKEN }}
-
-
-
