@@ -50,10 +50,9 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab
 
       - name: AutoTag Version Flutter
-        uses: jacopocarlini/action-autotag@stable
+        uses: mike-500/action-autotag@4.0.1
         with:
           GITHUB_TOKEN: "${{ secrets.TOKEN }}"
-          tag_prefix: "v"
 
       - name: Create Release
         uses: ncipollo/release-action@v1
