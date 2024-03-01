@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:pomodoro_timer/core/utils/notifications.dart';
+import 'package:pomodoro_timer/core/utils/vibration.dart';
 import 'package:pomodoro_timer/timer/data/datasource/local/setting_repository_db.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/set_sound_setting.dart';
@@ -22,6 +23,7 @@ void init() {
   sl.registerLazySingleton<NotificationHelper>(() => NotificationHelperImpl());
   sl.registerLazySingleton(() => const Countdown());
   sl.registerLazySingleton(() => TimeConverter());
+  sl.registerLazySingleton<VibrationL>(() => VibrationLImpl());
   sl.registerLazySingleton<AudioPlayerL>(() => AudioPlayerLImpl());
   sl.registerLazySingleton<ILogger>(() => LoggerImpl());
 
@@ -59,6 +61,7 @@ void init() {
       getTimerUsecase: sl(),
       getSoundSettingUsecase: sl(),
       audioPlayer: sl(),
+      vibration: sl(),
     ),
   );
 }

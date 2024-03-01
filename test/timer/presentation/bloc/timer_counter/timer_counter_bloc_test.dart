@@ -16,6 +16,7 @@ import 'package:pomodoro_timer/core/utils/countdown.dart';
 import 'package:pomodoro_timer/core/utils/error_object.dart';
 import 'package:pomodoro_timer/core/utils/notifications.dart';
 import 'package:pomodoro_timer/core/utils/time_converter.dart';
+import 'package:pomodoro_timer/core/utils/vibration.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
 import 'package:pomodoro_timer/timer/domain/usecase/get_sound_setting.dart';
@@ -30,6 +31,7 @@ import 'package:pomodoro_timer/timer/presentation/blocs/timer_counter/timer_coun
   MockSpec<GetSoundSettingUsecase>(),
   MockSpec<AudioPlayerLImpl>(),
   MockSpec<NotificationHelper>(),
+  MockSpec<VibrationLImpl>(),
 ])
 import 'timer_counter_bloc_test.mocks.dart';
 
@@ -57,6 +59,7 @@ void main() {
   late GetTimerUsecase getTimerUsecase;
   late GetSoundSettingUsecase getSoundSettingUsecase;
   late MockNotificationHelper notificationHelper;
+  late MockVibrationLImpl vibration;
   late int timeStamps;
   late AudioPlayerL audioPlayer;
 
@@ -69,6 +72,7 @@ void main() {
     getTimerUsecase = MockGetTimerUsecase();
     getSoundSettingUsecase = MockGetSoundSettingUsecase();
     notificationHelper = MockNotificationHelper();
+    vibration = MockVibrationLImpl();
     timeStamps =
         Clock.fixed(DateTime(2022, 09, 01)).now().millisecondsSinceEpoch;
     audioPlayer = MockAudioPlayerLImpl();
@@ -80,8 +84,6 @@ void main() {
         .thenReturn(Right(timerStreamController.stream));
     when(getSoundSettingUsecase())
         .thenReturn(Right(soundSettingController.stream));
-    // when(getTimerUsecase())
-    //     .thenAnswer((_) => timerStreamController.stream);
 
     bloc = withClock(
         Clock.fixed(DateTime(2022, 09, 01)),
@@ -93,6 +95,7 @@ void main() {
               audioPlayer: audioPlayer,
               timeConverter: timeConverter,
               notificationHelper: notificationHelper,
+              vibration: vibration,
             ));
 
     timerStreamController.add(timer);
@@ -294,7 +297,7 @@ void main() {
     );
 
     blocTest<TimerCounterBloc, TimerCounterState>(
-      'playSound should not be called when playSounds setting set to false',
+      'playSound should not be called when playSounds setting set to false instead stopSound and vibrate should be called',
       build: () => bloc,
       setUp: () async {
         when(countdown.count(duration - 1))
@@ -311,10 +314,10 @@ void main() {
         await untilCalled(countdown.count(duration - 1));
 
         await timerCounterStartedController.close();
-        await Future.delayed(const Duration(seconds: 1));
       },
       verify: (_) {
         verify(audioPlayer.stopSound()).called(1);
+        verify(vibration.vibrate(duration: anyNamed('duration'))).called(1);
         verifyNever(audioPlayer.playSound(soundSetting.defaultAudioPath));
       },
     );

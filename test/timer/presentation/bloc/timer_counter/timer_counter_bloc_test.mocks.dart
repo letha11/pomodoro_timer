@@ -16,6 +16,7 @@ import 'package:pomodoro_timer/core/utils/audio_player.dart' as _i12;
 import 'package:pomodoro_timer/core/utils/countdown.dart' as _i4;
 import 'package:pomodoro_timer/core/utils/notifications.dart' as _i14;
 import 'package:pomodoro_timer/core/utils/time_converter.dart' as _i7;
+import 'package:pomodoro_timer/core/utils/vibration.dart' as _i16;
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart'
     as _i11;
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart'
@@ -382,4 +383,38 @@ class MockNotificationHelper extends _i1.Mock
         ),
         returnValueForMissingStub: null,
       );
+
+  @override
+  void dismiss(int? id) => super.noSuchMethod(
+        Invocation.method(
+          #dismiss,
+          [id],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [VibrationLImpl].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockVibrationLImpl extends _i1.Mock implements _i16.VibrationLImpl {
+  @override
+  void vibrate({int? duration = 500}) => super.noSuchMethod(
+        Invocation.method(
+          #vibrate,
+          [],
+          {#duration: duration},
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i3.Future<bool?> hasCustomVibrationsSupport() => (super.noSuchMethod(
+        Invocation.method(
+          #hasCustomVibrationsSupport,
+          [],
+        ),
+        returnValue: _i3.Future<bool?>.value(),
+        returnValueForMissingStub: _i3.Future<bool?>.value(),
+      ) as _i3.Future<bool?>);
 }

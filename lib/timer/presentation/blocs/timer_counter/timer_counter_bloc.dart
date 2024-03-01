@@ -9,6 +9,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pomodoro_timer/core/constants.dart';
 import 'package:pomodoro_timer/core/utils/notifications.dart';
+import 'package:pomodoro_timer/core/utils/vibration.dart';
 import 'package:pomodoro_timer/timer/domain/entity/sound_setting_entity.dart';
 
 import 'package:pomodoro_timer/timer/domain/entity/timer_setting_entity.dart';
@@ -51,6 +52,7 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
   final GetTimerUsecase _getTimerUsecase;
   final GetSoundSettingUsecase _getSoundSettingUsecase;
   final NotificationHelper? _notificationHelper;
+  final VibrationL _vibration;
   late TimerSettingEntity timer;
   late SoundSettingEntity soundSetting;
   int _pomodoroCounter = 0;
@@ -68,12 +70,14 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
     required GetTimerUsecase getTimerUsecase,
     required GetSoundSettingUsecase getSoundSettingUsecase,
     required AudioPlayerL audioPlayer,
+    required VibrationL vibration,
     NotificationHelper? notificationHelper,
     ILogger? logger,
     StreamSubscription<int>? streamSubscription,
   })  : _countdown = countdown,
         _countdownSubscription = streamSubscription,
         _audioPlayer = audioPlayer,
+        _vibration = vibration,
         _notificationHelper = notificationHelper,
         _logger = logger,
         _getTimerUsecase = getTimerUsecase,
@@ -175,7 +179,6 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
             }
 
             _logger?.log(Level.debug, "Stream Finished");
-            // await Future.delayed(const Duration(seconds: 1));
 
             if (soundSetting.playSound) {
               // if (soundSetting.type.isDefault)
@@ -188,12 +191,12 @@ class TimerCounterBloc extends Bloc<TimerCounterEvent, TimerCounterState> {
                 _audioPlayer.playSoundFromUint8List(soundSetting.bytesData!);
               }
             } else {
-              if(await Vibration.hasCustomVibrationsSupport() ?? false) {
-                Vibration.vibrate(duration: 1000);
+              if(await _vibration.hasCustomVibrationsSupport() ?? false) {
+                _vibration.vibrate(duration: 1000);
               } else {
-                Vibration.vibrate();
+                _vibration.vibrate();
                 await Future.delayed(const Duration(milliseconds: 500));
-                Vibration.vibrate();
+                _vibration.vibrate();
               }
             }
 
